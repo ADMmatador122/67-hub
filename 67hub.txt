@@ -1,83 +1,122 @@
--- 67 HUB - UI LocalMaze + Funcionalidades Completas
--- by yuki/ADM_TROLLKKS
--- Todas as funções convertidas para elementos manuais (sem bibliotecas externas)
+-- 67 HUB - Versão Corrigida (UI própria, sem LocalMaze)
+-- by ADM_TROLLKKS / SouFeliz Scripts
 
--- ============================================================
--- OBTENDO A UI CRIADA PELO LOCALMAZE
--- ============================================================
 local Players = game:GetService("Players")
-local lp = Players.LocalPlayer
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
 local TeleportService = game:GetService("TeleportService")
-local VirtualInputManager = game:GetService("VirtualInputManager")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local StarterGui = game:GetService("StarterGui")
 local workspace = game:GetService("Workspace")
 
-local gui = lp.PlayerGui:WaitForChild("ScreenGui")
-local mainFrame = gui:WaitForChild("Frame")
-local titleButton = mainFrame:WaitForChild("TextButton")
+local lp = Players.LocalPlayer
 
--- Ajustes iniciais na interface
-mainFrame.Size = UDim2.new(0, 550, 0, 480)
-mainFrame.Position = UDim2.new(0.5, -275, 0.5, -240)
-mainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
-titleButton.Size = UDim2.new(1, 0, 0, 40)
-titleButton.Text = "67 HUB - by ADM_TROLLKKS"
-titleButton.BackgroundColor3 = Color3.fromRGB(220, 50, 50)
-titleButton.TextColor3 = Color3.new(1,1,1)
-titleButton.Font = Enum.Font.GothamBold
-titleButton.TextSize = 18
+-- ============================================================
+-- CRIAR SCREENGU DO ZERO (sem depender do LocalMaze)
+-- ============================================================
+-- Remove instância antiga se existir
+local oldGui = game.CoreGui:FindFirstChild("67HUB_Main")
+if oldGui then oldGui:Destroy() end
 
--- Tornar o frame arrastável (pelo título)
-local dragging = false
-local dragStart, startPos
-titleButton.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-        dragging = true
-        dragStart = input.Position
-        startPos = mainFrame.Position
-    end
-end)
-titleButton.InputEnded:Connect(function(input)
-    dragging = false
-end)
-UserInputService.InputChanged:Connect(function(input)
-    if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
-        local delta = input.Position - dragStart
-        mainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-    end
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "67HUB_Main"
+screenGui.ResetOnSpawn = false
+screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+screenGui.Parent = game.CoreGui
+
+local mainFrame = Instance.new("Frame")
+mainFrame.Size = UDim2.new(0, 560, 0, 500)
+mainFrame.Position = UDim2.new(0.5, -280, 0.5, -250)
+mainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 28)
+mainFrame.BorderSizePixel = 0
+mainFrame.Parent = screenGui
+Instance.new("UICorner", mainFrame).CornerRadius = UDim.new(0, 10)
+
+-- Stroke
+local stroke = Instance.new("UIStroke")
+stroke.Color = Color3.fromRGB(220, 50, 50)
+stroke.Thickness = 2
+stroke.Parent = mainFrame
+
+-- Título
+local titleBar = Instance.new("TextButton")
+titleBar.Size = UDim2.new(1, 0, 0, 42)
+titleBar.BackgroundColor3 = Color3.fromRGB(220, 50, 50)
+titleBar.Text = "67 HUB  |  by ADM_TROLLKKS  |  SouFeliz Scripts"
+titleBar.TextColor3 = Color3.new(1, 1, 1)
+titleBar.Font = Enum.Font.GothamBold
+titleBar.TextSize = 15
+titleBar.BorderSizePixel = 0
+titleBar.Parent = mainFrame
+Instance.new("UICorner", titleBar).CornerRadius = UDim.new(0, 10)
+
+-- Botão fechar
+local closeBtn = Instance.new("TextButton")
+closeBtn.Size = UDim2.new(0, 36, 0, 36)
+closeBtn.Position = UDim2.new(1, -40, 0, 3)
+closeBtn.BackgroundColor3 = Color3.fromRGB(180, 30, 30)
+closeBtn.Text = "✕"
+closeBtn.TextColor3 = Color3.new(1,1,1)
+closeBtn.Font = Enum.Font.GothamBold
+closeBtn.TextSize = 16
+closeBtn.BorderSizePixel = 0
+closeBtn.Parent = mainFrame
+Instance.new("UICorner", closeBtn).CornerRadius = UDim.new(0, 8)
+closeBtn.MouseButton1Click:Connect(function()
+    screenGui.Enabled = not screenGui.Enabled
 end)
 
--- Criar ScrollingFrame para o conteúdo
+-- Arrastar pelo título
+do
+    local dragging, dragStart, startPos = false, nil, nil
+    titleBar.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = true
+            dragStart = input.Position
+            startPos = mainFrame.Position
+        end
+    end)
+    titleBar.InputEnded:Connect(function() dragging = false end)
+    UserInputService.InputChanged:Connect(function(input)
+        if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+            local delta = input.Position - dragStart
+            mainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+        end
+    end)
+end
+
+-- ScrollingFrame
 local scroller = Instance.new("ScrollingFrame")
-scroller.Size = UDim2.new(1, 0, 1, -40)
-scroller.Position = UDim2.new(0, 0, 0, 40)
+scroller.Size = UDim2.new(1, -8, 1, -50)
+scroller.Position = UDim2.new(0, 4, 0, 46)
 scroller.BackgroundTransparency = 1
 scroller.BorderSizePixel = 0
 scroller.CanvasSize = UDim2.new(0, 0, 0, 0)
-scroller.ScrollBarThickness = 8
-scroller.ScrollBarImageColor3 = Color3.fromRGB(150,150,150)
+scroller.ScrollBarThickness = 5
+scroller.ScrollBarImageColor3 = Color3.fromRGB(220, 50, 50)
 scroller.Parent = mainFrame
 
 local layout = Instance.new("UIListLayout")
-layout.Padding = UDim.new(0, 8)
+layout.Padding = UDim.new(0, 6)
 layout.SortOrder = Enum.SortOrder.LayoutOrder
 layout.Parent = scroller
 
-local function updateCanvas()
+local padding = Instance.new("UIPadding")
+padding.PaddingTop = UDim.new(0, 6)
+padding.PaddingLeft = UDim.new(0, 6)
+padding.PaddingRight = UDim.new(0, 6)
+padding.Parent = scroller
+
+layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
     task.wait()
-    scroller.CanvasSize = UDim2.new(0, 0, 0, layout.AbsoluteContentSize.Y + 10)
-end
-layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(updateCanvas)
+    scroller.CanvasSize = UDim2.new(0, 0, 0, layout.AbsoluteContentSize.Y + 16)
+end)
 
 -- ============================================================
 -- VARIÁVEIS GLOBAIS
 -- ============================================================
-local LocalPlayer = lp
 local selectedPlayerName = nil
-local headsitActive = false
 local espEnabled = false
 local espColor = "RGB"
 local billboardGuis = {}
@@ -85,9 +124,8 @@ local infiniteJumpEnabled = false
 local antiSitEnabled = false
 local noclipEnabled = false
 local noclipConn = nil
-local selectedVehicle = nil
-local currentMusicID = ""
 local loopAllActive = false
+local currentMusicID = ""
 local rgbSpeed = 3
 local nameBioActive = false
 local corpoRGB = false
@@ -95,809 +133,771 @@ local cabeloRGB = false
 local casaRGB = false
 local carroRGB = false
 local bikeRGB = false
-local radioRGB = false
-local megafoneRGB = false
 
 -- ============================================================
 -- FUNÇÕES AUXILIARES
 -- ============================================================
-local function tocarMusica(id)
-    local RE = ReplicatedStorage:FindFirstChild("RE")
-    if not RE then return end
-    pcall(RE.PlayerToolEvent.FireServer, RE.PlayerToolEvent, "ToolMusicText", id)
-    pcall(RE["1Player1sHous1e"].FireServer, RE["1Player1sHous1e"], "PickHouseMusicText", id)
-    pcall(RE["1Player1sCa1r"].FireServer, RE["1Player1sCa1r"], "PickingCarMusicText", id)
-    pcall(RE["1NoMoto1rVehicle1s"].FireServer, RE["1NoMoto1rVehicle1s"], "PickingScooterMusicText", id)
+local function notify(title, text)
+    pcall(function()
+        StarterGui:SetCore("SendNotification", {Title = title, Text = text, Duration = 3})
+    end)
 end
 
 local function getRainbowColor()
-    local h = (tick() * rgbSpeed % 5) / 5
-    return Color3.fromHSV(h, 1, 1)
+    return Color3.fromHSV((tick() * rgbSpeed % 5) / 5, 1, 1)
 end
 
-local function fireServerRGB(eventName, ...)
+local function tocarMusica(id)
+    local RE = ReplicatedStorage:FindFirstChild("RE")
+    if not RE then return end
+    pcall(function() RE.PlayerToolEvent:FireServer("ToolMusicText", id) end)
+    pcall(function() RE["1Player1sHous1e"]:FireServer("PickHouseMusicText", id) end)
+    pcall(function() RE["1Player1sCa1r"]:FireServer("PickingCarMusicText", id) end)
+    pcall(function() RE["1NoMoto1rVehicle1s"]:FireServer("PickingScooterMusicText", id) end)
+end
+
+local function fireServerRE(eventName, ...)
     local RE = ReplicatedStorage:FindFirstChild("RE")
     if RE and RE:FindFirstChild(eventName) then
-        pcall(RE[eventName].FireServer, RE[eventName], ...)
+        pcall(function() RE[eventName]:FireServer(...) end)
     end
 end
 
 local function findPlayerByPartialName(partial)
     partial = partial:lower()
-    for _, player in pairs(Players:GetPlayers()) do
-        if player ~= LocalPlayer and player.Name:lower():sub(1, #partial) == partial then
-            return player
-        end
+    for _, p in pairs(Players:GetPlayers()) do
+        if p ~= lp and p.Name:lower():sub(1, #partial) == partial then return p end
     end
     return nil
 end
 
-local function headsitOnPlayer(targetPlayer)
-    local character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
-    local humanoid = character:FindFirstChildOfClass("Humanoid")
-    if not targetPlayer.Character or not targetPlayer.Character:FindFirstChild("Head") then return false end
-    local targetHead = targetPlayer.Character.Head
-    local localRoot = character:FindFirstChild("HumanoidRootPart")
-    if not localRoot then return false end
-    localRoot.CFrame = targetHead.CFrame * CFrame.new(0, 2.2, 0)
-    for _, v in pairs(localRoot:GetChildren()) do if v:IsA("WeldConstraint") then v:Destroy() end end
-    local weld = Instance.new("WeldConstraint")
-    weld.Part0 = localRoot
-    weld.Part1 = targetHead
-    weld.Parent = localRoot
-    if humanoid then humanoid.Sit = true end
-    return true
+-- ============================================================
+-- COMPONENTES UI
+-- ============================================================
+local function createCategory(title)
+    local cat = Instance.new("Frame")
+    cat.Size = UDim2.new(1, -4, 0, 36)
+    cat.BackgroundColor3 = Color3.fromRGB(220, 50, 50)
+    cat.BorderSizePixel = 0
+    cat.Parent = scroller
+    Instance.new("UICorner", cat).CornerRadius = UDim.new(0, 7)
+    local lbl = Instance.new("TextLabel")
+    lbl.Size = UDim2.new(1, -10, 1, 0)
+    lbl.Position = UDim2.new(0, 10, 0, 0)
+    lbl.BackgroundTransparency = 1
+    lbl.Text = title
+    lbl.TextColor3 = Color3.new(1, 1, 1)
+    lbl.Font = Enum.Font.GothamBold
+    lbl.TextSize = 14
+    lbl.TextXAlignment = Enum.TextXAlignment.Left
+    lbl.Parent = cat
+    return cat
 end
 
-local function removeHeadsit()
-    local character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
-    local humanoid = character:FindFirstChildOfClass("Humanoid")
-    local localRoot = character:FindFirstChild("HumanoidRootPart")
-    if localRoot then
-        for _, v in pairs(localRoot:GetChildren()) do if v:IsA("WeldConstraint") then v:Destroy() end end
+local function createFrame(h)
+    local f = Instance.new("Frame")
+    f.Size = UDim2.new(1, -4, 0, h or 34)
+    f.BackgroundColor3 = Color3.fromRGB(32, 32, 42)
+    f.BorderSizePixel = 0
+    f.Parent = scroller
+    Instance.new("UICorner", f).CornerRadius = UDim.new(0, 7)
+    return f
+end
+
+local function createButton(text, callback)
+    local f = createFrame(34)
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(1, 0, 1, 0)
+    btn.BackgroundTransparency = 1
+    btn.Text = text
+    btn.TextColor3 = Color3.new(1, 1, 1)
+    btn.Font = Enum.Font.Gotham
+    btn.TextSize = 13
+    btn.Parent = f
+    btn.MouseButton1Click:Connect(callback)
+    -- hover
+    btn.MouseEnter:Connect(function() TweenService:Create(f, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(55, 55, 70)}):Play() end)
+    btn.MouseLeave:Connect(function() TweenService:Create(f, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(32, 32, 42)}):Play() end)
+    return f
+end
+
+local function createToggle(text, default, callback)
+    local f = createFrame(34)
+    local lbl = Instance.new("TextLabel")
+    lbl.Size = UDim2.new(0.72, 0, 1, 0)
+    lbl.Position = UDim2.new(0, 10, 0, 0)
+    lbl.BackgroundTransparency = 1
+    lbl.Text = text
+    lbl.TextColor3 = Color3.new(0.85, 0.85, 0.85)
+    lbl.Font = Enum.Font.Gotham
+    lbl.TextSize = 13
+    lbl.TextXAlignment = Enum.TextXAlignment.Left
+    lbl.Parent = f
+    local toggle = Instance.new("TextButton")
+    toggle.Size = UDim2.new(0, 58, 0, 24)
+    toggle.Position = UDim2.new(1, -66, 0.5, -12)
+    toggle.BackgroundColor3 = default and Color3.fromRGB(0, 190, 80) or Color3.fromRGB(80, 80, 90)
+    toggle.Text = default and "ON" or "OFF"
+    toggle.TextColor3 = Color3.new(1, 1, 1)
+    toggle.Font = Enum.Font.GothamBold
+    toggle.TextSize = 12
+    toggle.BorderSizePixel = 0
+    toggle.Parent = f
+    Instance.new("UICorner", toggle).CornerRadius = UDim.new(1, 0)
+    local state = default
+    toggle.MouseButton1Click:Connect(function()
+        state = not state
+        TweenService:Create(toggle, TweenInfo.new(0.2), {
+            BackgroundColor3 = state and Color3.fromRGB(0, 190, 80) or Color3.fromRGB(80, 80, 90)
+        }):Play()
+        toggle.Text = state and "ON" or "OFF"
+        callback(state)
+    end)
+    return f
+end
+
+local function createSlider(text, minV, maxV, defV, callback)
+    local f = createFrame(58)
+    local lbl = Instance.new("TextLabel")
+    lbl.Size = UDim2.new(1, -10, 0, 18)
+    lbl.Position = UDim2.new(0, 10, 0, 4)
+    lbl.BackgroundTransparency = 1
+    lbl.Text = text .. ": " .. defV
+    lbl.TextColor3 = Color3.new(0.85, 0.85, 0.85)
+    lbl.Font = Enum.Font.Gotham
+    lbl.TextSize = 12
+    lbl.TextXAlignment = Enum.TextXAlignment.Left
+    lbl.Parent = f
+    local bg = Instance.new("Frame")
+    bg.Size = UDim2.new(1, -20, 0, 14)
+    bg.Position = UDim2.new(0, 10, 0, 28)
+    bg.BackgroundColor3 = Color3.fromRGB(50, 50, 62)
+    bg.BorderSizePixel = 0
+    bg.Parent = f
+    Instance.new("UICorner", bg).CornerRadius = UDim.new(1, 0)
+    local fill = Instance.new("Frame")
+    fill.Size = UDim2.new((defV - minV) / (maxV - minV), 0, 1, 0)
+    fill.BackgroundColor3 = Color3.fromRGB(220, 50, 50)
+    fill.BorderSizePixel = 0
+    fill.Parent = bg
+    Instance.new("UICorner", fill).CornerRadius = UDim.new(1, 0)
+    local dragging = false
+    local function update(pos)
+        local rel = math.clamp((pos.X - bg.AbsolutePosition.X) / bg.AbsoluteSize.X, 0, 1)
+        local val = math.floor(minV + rel * (maxV - minV))
+        fill.Size = UDim2.new(rel, 0, 1, 0)
+        lbl.Text = text .. ": " .. val
+        callback(val)
     end
-    if humanoid then humanoid.Sit = false end
+    bg.InputBegan:Connect(function(i)
+        if i.UserInputType == Enum.UserInputType.MouseButton1 or i.UserInputType == Enum.UserInputType.Touch then
+            dragging = true update(i.Position)
+        end
+    end)
+    UserInputService.InputEnded:Connect(function() dragging = false end)
+    UserInputService.InputChanged:Connect(function(i)
+        if dragging and (i.UserInputType == Enum.UserInputType.MouseMovement or i.UserInputType == Enum.UserInputType.Touch) then
+            update(i.Position)
+        end
+    end)
+    return f
 end
 
--- ESP
+local function createInput(placeholder, callback)
+    local f = createFrame(36)
+    local box = Instance.new("TextBox")
+    box.Size = UDim2.new(1, -10, 1, -6)
+    box.Position = UDim2.new(0, 5, 0, 3)
+    box.BackgroundColor3 = Color3.fromRGB(44, 44, 56)
+    box.PlaceholderText = placeholder
+    box.PlaceholderColor3 = Color3.fromRGB(120, 120, 130)
+    box.Text = ""
+    box.TextColor3 = Color3.new(1, 1, 1)
+    box.Font = Enum.Font.Gotham
+    box.TextSize = 13
+    box.BorderSizePixel = 0
+    box.Parent = f
+    Instance.new("UICorner", box).CornerRadius = UDim.new(0, 5)
+    box.FocusLost:Connect(function()
+        if box.Text ~= "" then callback(box.Text) end
+    end)
+    return f
+end
+
+local function createDropdown(title, options, callback)
+    local wrapper = Instance.new("Frame")
+    wrapper.Size = UDim2.new(1, -4, 0, 58)
+    wrapper.BackgroundTransparency = 1
+    wrapper.ClipsDescendants = false
+    wrapper.Parent = scroller
+
+    local f = createFrame(58)
+    f.Parent = nil
+    f.Size = UDim2.new(1, 0, 0, 58)
+    f.Parent = wrapper
+
+    local lbl = Instance.new("TextLabel")
+    lbl.Size = UDim2.new(1, -10, 0, 18)
+    lbl.Position = UDim2.new(0, 10, 0, 4)
+    lbl.BackgroundTransparency = 1
+    lbl.Text = title
+    lbl.TextColor3 = Color3.new(0.7, 0.7, 0.7)
+    lbl.Font = Enum.Font.Gotham
+    lbl.TextSize = 11
+    lbl.TextXAlignment = Enum.TextXAlignment.Left
+    lbl.Parent = f
+
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(1, -10, 0, 26)
+    btn.Position = UDim2.new(0, 5, 0, 24)
+    btn.BackgroundColor3 = Color3.fromRGB(50, 50, 62)
+    btn.Text = (options[1] or "Selecione") .. "  ▾"
+    btn.TextColor3 = Color3.new(1, 1, 1)
+    btn.Font = Enum.Font.Gotham
+    btn.TextSize = 12
+    btn.BorderSizePixel = 0
+    btn.Parent = f
+    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 5)
+
+    -- Lista dropdown
+    local listFrame = Instance.new("Frame")
+    listFrame.Size = UDim2.new(1, -10, 0, math.min(#options, 6) * 26)
+    listFrame.Position = UDim2.new(0, 5, 0, 56)
+    listFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 52)
+    listFrame.BorderSizePixel = 0
+    listFrame.Visible = false
+    listFrame.ZIndex = 20
+    listFrame.Parent = wrapper
+    Instance.new("UICorner", listFrame).CornerRadius = UDim.new(0, 5)
+
+    local listScroll = Instance.new("ScrollingFrame")
+    listScroll.Size = UDim2.new(1, 0, 1, 0)
+    listScroll.BackgroundTransparency = 1
+    listScroll.BorderSizePixel = 0
+    listScroll.ScrollBarThickness = 3
+    listScroll.ScrollBarImageColor3 = Color3.fromRGB(220, 50, 50)
+    listScroll.CanvasSize = UDim2.new(0, 0, 0, #options * 26)
+    listScroll.Parent = listFrame
+    local ll = Instance.new("UIListLayout")
+    ll.Padding = UDim.new(0, 1)
+    ll.Parent = listScroll
+
+    for _, opt in ipairs(options) do
+        local ob = Instance.new("TextButton")
+        ob.Size = UDim2.new(1, 0, 0, 25)
+        ob.BackgroundColor3 = Color3.fromRGB(50, 50, 62)
+        ob.Text = opt
+        ob.TextColor3 = Color3.new(1, 1, 1)
+        ob.Font = Enum.Font.Gotham
+        ob.TextSize = 12
+        ob.BorderSizePixel = 0
+        ob.ZIndex = 21
+        ob.Parent = listScroll
+        ob.MouseButton1Click:Connect(function()
+            btn.Text = opt .. "  ▾"
+            listFrame.Visible = false
+            callback(opt)
+        end)
+        ob.MouseEnter:Connect(function() ob.BackgroundColor3 = Color3.fromRGB(70, 70, 85) end)
+        ob.MouseLeave:Connect(function() ob.BackgroundColor3 = Color3.fromRGB(50, 50, 62) end)
+    end
+
+    btn.MouseButton1Click:Connect(function()
+        listFrame.Visible = not listFrame.Visible
+    end)
+    return wrapper
+end
+
+-- ============================================================
+-- SEÇÃO: INFO
+-- ============================================================
+createCategory("⭐ INFO")
+createButton("🔁 Rejoin", function()
+    TeleportService:TeleportToPlaceInstance(game.PlaceId, game.JobId, lp)
+end)
+createButton("🛩️ Fly GUI Universal", function()
+    loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-Fly-gui-v3-30439"))()
+end)
+
+-- ============================================================
+-- SEÇÃO: MÚSICAS RÁPIDAS
+-- ============================================================
+createCategory("🎵 MÚSICAS RÁPIDAS")
+local musicList = {
+    {"Poze - Tropa do General", "76260463454427"},
+    {"Aplico o Chá", "125706696726990"},
+    {"Dom Dom Dom", "71010430843983"},
+    {"Amiguinhos que ta de Pt", "101427115159319"},
+    {"MC Poze - Saudades", "126572558378318"},
+    {"Quem n bafora", "105021704860122"},
+    {"Pros menor que vende", "90252250244704"},
+    {"Ritmada", "74867410898061"},
+    {"MC IG - 3 Dias", "110821596297428"},
+    {"Amiguinha Best", "138021904914351"},
+    {"Pena que acabou", "105322893381167"},
+    {"Japa NK", "94090546957206"},
+    {"Não para não baby", "132790002708106"},
+    {"Olha a explosão", "121075115415245"},
+    {"Eu vou cuspir", "133208997220334"},
+    {"Hylander - Comédia", "88307287482579"},
+    {"Baile do Antares", "100133382335077"},
+    {"SOU COMEDOR", "125415203699674"},
+    {"Vai rebola pro pai", "120075559226752"},
+    {"Mtg anos 2000 dj arana", "73111349649862"},
+}
+for _, m in ipairs(musicList) do
+    local name, id = m[1], m[2]
+    createButton("▶ " .. name, function() tocarMusica(id) end)
+end
+createButton("⏹️ Parar Música", function() tocarMusica("") end)
+
+-- ============================================================
+-- SEÇÃO: PLAYER CONTROLS
+-- ============================================================
+createCategory("👤 PLAYER CONTROLS")
+createInput("Nome do jogador (parcial)", function(v)
+    local found = findPlayerByPartialName(v)
+    if found then
+        selectedPlayerName = found.Name
+        notify("✅ Selecionado", found.Name)
+    else
+        notify("❌ Erro", "Jogador não encontrado")
+    end
+end)
+createButton("📍 Teleportar até player", function()
+    if not selectedPlayerName then notify("❌", "Selecione um jogador") return end
+    local t = Players:FindFirstChild(selectedPlayerName)
+    if t and t.Character and t.Character:FindFirstChild("HumanoidRootPart") then
+        local root = lp.Character and lp.Character:FindFirstChild("HumanoidRootPart")
+        if root then root.CFrame = t.Character.HumanoidRootPart.CFrame end
+    end
+end)
+createToggle("🧠 Headsit", false, function(state)
+    if state then
+        if not selectedPlayerName then notify("❌", "Selecione um jogador") return end
+        local target = Players:FindFirstChild(selectedPlayerName)
+        if target and target.Character and target.Character:FindFirstChild("Head") then
+            local char = lp.Character or lp.CharacterAdded:Wait()
+            local root = char:FindFirstChild("HumanoidRootPart")
+            local hum = char:FindFirstChildOfClass("Humanoid")
+            if root then
+                root.CFrame = target.Character.Head.CFrame * CFrame.new(0, 2.5, 0)
+                for _, w in pairs(root:GetChildren()) do if w:IsA("WeldConstraint") then w:Destroy() end end
+                local weld = Instance.new("WeldConstraint")
+                weld.Part0 = root weld.Part1 = target.Character.Head weld.Parent = root
+                if hum then hum.Sit = true end
+            end
+        end
+    else
+        local char = lp.Character
+        if char then
+            local root = char:FindFirstChild("HumanoidRootPart")
+            local hum = char:FindFirstChildOfClass("Humanoid")
+            if root then for _, w in pairs(root:GetChildren()) do if w:IsA("WeldConstraint") then w:Destroy() end end end
+            if hum then hum.Sit = false end
+        end
+    end
+end)
+createSlider("🏃 Velocidade", 16, 300, 16, function(v)
+    local hum = lp.Character and lp.Character:FindFirstChildOfClass("Humanoid")
+    if hum then hum.WalkSpeed = v end
+end)
+createSlider("🦘 Pulo", 50, 500, 50, function(v)
+    local hum = lp.Character and lp.Character:FindFirstChildOfClass("Humanoid")
+    if hum then hum.JumpPower = v end
+end)
+createSlider("🌍 Gravidade", 0, 500, 196, function(v)
+    workspace.Gravity = v
+end)
+createToggle("♾️ Infinite Jump", false, function(state)
+    infiniteJumpEnabled = state
+end)
+UserInputService.JumpRequest:Connect(function()
+    if infiniteJumpEnabled then
+        local hum = lp.Character and lp.Character:FindFirstChildOfClass("Humanoid")
+        if hum then hum:ChangeState(Enum.HumanoidStateType.Jumping) end
+    end
+end)
+createToggle("🪑 Anti-Sit", false, function(state)
+    antiSitEnabled = state
+    local hum = lp.Character and lp.Character:FindFirstChildOfClass("Humanoid")
+    if hum then
+        hum:SetStateEnabled(Enum.HumanoidStateType.Seated, not state)
+        if state and hum.Sit then hum.Sit = false end
+    end
+end)
+createToggle("🌀 Noclip", false, function(state)
+    noclipEnabled = state
+    if noclipConn then noclipConn:Disconnect() noclipConn = nil end
+    if state then
+        noclipConn = RunService.Heartbeat:Connect(function()
+            local char = lp.Character
+            if char then
+                for _, p in pairs(char:GetDescendants()) do
+                    if p:IsA("BasePart") then p.CanCollide = false end
+                end
+            end
+        end)
+    end
+end)
+createButton("🔁 Reset Speed/Gravity/Jump", function()
+    local hum = lp.Character and lp.Character:FindFirstChildOfClass("Humanoid")
+    if hum then hum.WalkSpeed = 16 hum.JumpPower = 50 end
+    workspace.Gravity = 196.2
+    infiniteJumpEnabled = false
+end)
+
+-- ============================================================
+-- SEÇÃO: ESP
+-- ============================================================
+createCategory("👁️ ESP")
+createDropdown("Cor do ESP", {"RGB","Vermelho","Verde","Azul","Amarelo","Rosa","Roxo","Branco","Preto"}, function(v)
+    espColor = v
+end)
+
 local function getESPColor()
     if espColor == "RGB" then return getRainbowColor()
-    elseif espColor == "Preto" then return Color3.new(0,0,0)
-    elseif espColor == "Branco" then return Color3.new(1,1,1)
     elseif espColor == "Vermelho" then return Color3.new(1,0,0)
     elseif espColor == "Verde" then return Color3.new(0,1,0)
     elseif espColor == "Azul" then return Color3.new(0,0.5,1)
     elseif espColor == "Amarelo" then return Color3.new(1,1,0)
     elseif espColor == "Rosa" then return Color3.new(1,0.5,0.8)
     elseif espColor == "Roxo" then return Color3.new(0.5,0,0.5)
+    elseif espColor == "Branco" then return Color3.new(1,1,1)
+    elseif espColor == "Preto" then return Color3.new(0,0,0)
     end
     return Color3.new(1,1,1)
 end
 
-local function updateESP(player)
-    if player == LocalPlayer or not espEnabled then return end
-    local character = player.Character
-    if character and character:FindFirstChild("Head") then
-        local head = character.Head
-        if billboardGuis[player] then billboardGuis[player]:Destroy() end
+local function removeESP(p)
+    if billboardGuis[p] then billboardGuis[p]:Destroy() billboardGuis[p] = nil end
+end
+local function updateESP(p)
+    if p == lp or not espEnabled then return end
+    local char = p.Character
+    if char and char:FindFirstChild("Head") then
+        if billboardGuis[p] then billboardGuis[p]:Destroy() end
         local bill = Instance.new("BillboardGui")
         bill.Size = UDim2.new(0, 200, 0, 40)
-        bill.StudsOffset = Vector3.new(0, 2.5, 0)
+        bill.StudsOffset = Vector3.new(0, 3, 0)
         bill.AlwaysOnTop = true
-        bill.Parent = head
-        local text = Instance.new("TextLabel")
-        text.Size = UDim2.new(1,0,1,0)
-        text.BackgroundTransparency = 1
-        text.Text = player.Name .. " | " .. player.AccountAge .. "d"
-        text.TextColor3 = getESPColor()
-        text.Font = Enum.Font.SourceSansBold
-        text.TextSize = 14
-        text.Parent = bill
-        billboardGuis[player] = bill
+        bill.Parent = char.Head
+        local tl = Instance.new("TextLabel")
+        tl.Size = UDim2.new(1,0,1,0)
+        tl.BackgroundTransparency = 1
+        tl.Text = p.Name .. " | " .. p.AccountAge .. "d"
+        tl.TextColor3 = getESPColor()
+        tl.Font = Enum.Font.SourceSansBold
+        tl.TextSize = 14
+        tl.Parent = bill
+        billboardGuis[p] = bill
     end
 end
 
-local function removeESP(player)
-    if billboardGuis[player] then billboardGuis[player]:Destroy() end
-    billboardGuis[player] = nil
-end
-
--- ============================================================
--- ELEMENTOS DE UI MANUAIS (Categorias)
--- ============================================================
-local function createCategory(title)
-    local cat = Instance.new("Frame")
-    cat.Size = UDim2.new(1, -16, 0, 40)
-    cat.BackgroundColor3 = Color3.fromRGB(45, 45, 55)
-    cat.BorderSizePixel = 0
-    local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0, 8)
-    corner.Parent = cat
-    local lbl = Instance.new("TextLabel")
-    lbl.Size = UDim2.new(1,0,1,0)
-    lbl.BackgroundTransparency = 1
-    lbl.Text = title
-    lbl.TextColor3 = Color3.new(1,1,1)
-    lbl.Font = Enum.Font.GothamBold
-    lbl.TextSize = 18
-    lbl.Parent = cat
-    cat.Parent = scroller
-    return cat
-end
-
-local function createButton(parent, text, callback)
-    local btn = Instance.new("TextButton")
-    btn.Size = UDim2.new(1, -8, 0, 34)
-    btn.BackgroundColor3 = Color3.fromRGB(65, 65, 75)
-    btn.Text = text
-    btn.TextColor3 = Color3.new(1,1,1)
-    btn.Font = Enum.Font.SourceSans
-    btn.TextSize = 14
-    btn.BorderSizePixel = 0
-    local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0, 6)
-    corner.Parent = btn
-    btn.Parent = parent
-    btn.MouseButton1Click:Connect(callback)
-    return btn
-end
-
-local function createToggle(parent, text, defaultValue, callback)
-    local frame = Instance.new("Frame")
-    frame.Size = UDim2.new(1, -8, 0, 34)
-    frame.BackgroundTransparency = 1
-    frame.Parent = parent
-    local lbl = Instance.new("TextLabel")
-    lbl.Size = UDim2.new(0.7, 0, 1, 0)
-    lbl.Text = text
-    lbl.TextColor3 = Color3.new(1,1,1)
-    lbl.TextXAlignment = Enum.TextXAlignment.Left
-    lbl.BackgroundTransparency = 1
-    lbl.Font = Enum.Font.SourceSans
-    lbl.TextSize = 14
-    lbl.Parent = frame
-    local toggleBtn = Instance.new("TextButton")
-    toggleBtn.Size = UDim2.new(0, 70, 0, 28)
-    toggleBtn.Position = UDim2.new(1, -76, 0.5, -14)
-    toggleBtn.BackgroundColor3 = defaultValue and Color3.fromRGB(0,180,0) or Color3.fromRGB(100,100,110)
-    toggleBtn.Text = defaultValue and "ON" or "OFF"
-    toggleBtn.TextColor3 = Color3.new(1,1,1)
-    toggleBtn.BorderSizePixel = 0
-    local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(1, 0)
-    corner.Parent = toggleBtn
-    toggleBtn.Parent = frame
-    local state = defaultValue
-    toggleBtn.MouseButton1Click:Connect(function()
-        state = not state
-        toggleBtn.BackgroundColor3 = state and Color3.fromRGB(0,180,0) or Color3.fromRGB(100,100,110)
-        toggleBtn.Text = state and "ON" or "OFF"
-        callback(state)
-    end)
-    return frame
-end
-
-local function createSlider(parent, text, minVal, maxVal, defaultVal, callback)
-    local frame = Instance.new("Frame")
-    frame.Size = UDim2.new(1, -8, 0, 55)
-    frame.BackgroundTransparency = 1
-    frame.Parent = parent
-    local lbl = Instance.new("TextLabel")
-    lbl.Size = UDim2.new(1,0,0,20)
-    lbl.Text = text .. ": " .. defaultVal
-    lbl.TextColor3 = Color3.new(1,1,1)
-    lbl.BackgroundTransparency = 1
-    lbl.Font = Enum.Font.SourceSans
-    lbl.TextSize = 13
-    lbl.Parent = frame
-    local sliderBg = Instance.new("Frame")
-    sliderBg.Size = UDim2.new(1, 0, 0, 20)
-    sliderBg.Position = UDim2.new(0, 0, 0, 24)
-    sliderBg.BackgroundColor3 = Color3.fromRGB(60,60,70)
-    sliderBg.BorderSizePixel = 0
-    local sliderCorner = Instance.new("UICorner")
-    sliderCorner.CornerRadius = UDim.new(1,0)
-    sliderCorner.Parent = sliderBg
-    sliderBg.Parent = frame
-    local fill = Instance.new("Frame")
-    fill.Size = UDim2.new((defaultVal-minVal)/(maxVal-minVal), 0, 1, 0)
-    fill.BackgroundColor3 = Color3.fromRGB(220,50,50)
-    fill.BorderSizePixel = 0
-    fill.Parent = sliderBg
-    local dragging = false
-    local function updateSlider(inputPos)
-        local rel = (inputPos.X - sliderBg.AbsolutePosition.X) / sliderBg.AbsoluteSize.X
-        rel = math.clamp(rel, 0, 1)
-        local val = minVal + rel * (maxVal - minVal)
-        fill.Size = UDim2.new(rel, 0, 1, 0)
-        lbl.Text = text .. ": " .. math.floor(val)
-        callback(math.floor(val))
-    end
-    sliderBg.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-            dragging = true
-            updateSlider(input.Position)
-        end
-    end)
-    UserInputService.InputEnded:Connect(function(input)
-        dragging = false
-    end)
-    UserInputService.InputChanged:Connect(function(input)
-        if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
-            updateSlider(input.Position)
-        end
-    end)
-    return frame
-end
-
-local function createInput(parent, placeholder, callback)
-    local frame = Instance.new("Frame")
-    frame.Size = UDim2.new(1, -8, 0, 34)
-    frame.BackgroundTransparency = 1
-    frame.Parent = parent
-    local box = Instance.new("TextBox")
-    box.Size = UDim2.new(1, 0, 1, 0)
-    box.PlaceholderText = placeholder
-    box.Text = ""
-    box.BackgroundColor3 = Color3.fromRGB(50,50,60)
-    box.TextColor3 = Color3.new(1,1,1)
-    box.Font = Enum.Font.SourceSans
-    box.TextSize = 14
-    local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0, 6)
-    corner.Parent = box
-    box.Parent = frame
-    box.FocusLost:Connect(function()
-        if box.Text ~= "" then callback(box.Text) end
-    end)
-    return frame
-end
-
-local function createDropdown(parent, title, options, callback)
-    local frame = Instance.new("Frame")
-    frame.Size = UDim2.new(1, -8, 0, 50)
-    frame.BackgroundTransparency = 1
-    frame.Parent = parent
-    local lbl = Instance.new("TextLabel")
-    lbl.Size = UDim2.new(1,0,0,20)
-    lbl.Text = title
-    lbl.TextColor3 = Color3.new(1,1,1)
-    lbl.BackgroundTransparency = 1
-    lbl.Font = Enum.Font.SourceSans
-    lbl.TextSize = 13
-    lbl.Parent = frame
-    local btn = Instance.new("TextButton")
-    btn.Size = UDim2.new(0, 160, 0, 28)
-    btn.Position = UDim2.new(0, 0, 0, 22)
-    btn.BackgroundColor3 = Color3.fromRGB(55,55,65)
-    btn.Text = options[1] or "Selecione"
-    btn.TextColor3 = Color3.new(1,1,1)
-    btn.BorderSizePixel = 0
-    local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0, 6)
-    corner.Parent = btn
-    btn.Parent = frame
-    local dropdown = Instance.new("Frame")
-    dropdown.Size = UDim2.new(0, 160, 0, 28 * #options)
-    dropdown.Position = UDim2.new(0, 0, 0, 50)
-    dropdown.BackgroundColor3 = Color3.fromRGB(45,45,55)
-    dropdown.Visible = false
-    dropdown.ZIndex = 10
-    dropdown.Parent = frame
-    local listLayout = Instance.new("UIListLayout")
-    listLayout.Padding = UDim.new(0, 1)
-    listLayout.Parent = dropdown
-    for _, opt in ipairs(options) do
-        local optBtn = Instance.new("TextButton")
-        optBtn.Size = UDim2.new(1,0,0,28)
-        optBtn.BackgroundColor3 = Color3.fromRGB(55,55,65)
-        optBtn.Text = opt
-        optBtn.TextColor3 = Color3.new(1,1,1)
-        optBtn.BorderSizePixel = 0
-        optBtn.Parent = dropdown
-        optBtn.MouseButton1Click:Connect(function()
-            btn.Text = opt
-            dropdown.Visible = false
-            callback(opt)
-        end)
-    end
-    btn.MouseButton1Click:Connect(function()
-        dropdown.Visible = not dropdown.Visible
-    end)
-    return frame
-end
-
-local function createTextBox(parent, placeholder, callback)
-    return createInput(parent, placeholder, callback)
-end
-
--- ============================================================
--- CRIAÇÃO DAS ABAS (categorias) COM TODAS AS FUNCIONALIDADES
--- ============================================================
-
--- ========== INFO ==========
-local infoCat = createCategory("⭐ INFO")
-createButton(infoCat, "🔁 Rejoin", function()
-    TeleportService:TeleportToPlaceInstance(game.PlaceId, game.JobId, LocalPlayer)
-end)
-createButton(infoCat, "🚀 Fly GUI (Universal)", function()
-    loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-Fly-gui-v3-30439"))()
-end)
-
--- ========== MÚSICAS RÁPIDAS ==========
-local musicCat = createCategory("🎵 MÚSICAS RÁPIDAS (67 HUB)")
-local musicList = {
-    "76260463454427|Poze - Tropa do General","125706696726990|Aplico o Chá","71010430843983|Dom Dom Dom",
-    "101427115159319|Amiguinhos que ta de Pt","126572558378318|MC Poze - Saudades","105021704860122|Quem n bafora",
-    "90252250244704|Pros menor que vende","74867410898061|Ritmada","110821596297428|MC IG - 3 Dias",
-    "138021904914351|Amiguinha Best","105322893381167|Pena que acabou","94090546957206|Japa NK",
-    "132790002708106|Não para não baby","121075115415245|Olha a explosão","133208997220334|Eu vou cuspir",
-    "88307287482579|Hylander - Comédia","100133382335077|Baile do Antares","125415203699674|SOU COMEDOR",
-    "120075559226752|vai rebola pro pai","73111349649862|Mtg anos 2000 dj arana"
-}
-for _, entry in ipairs(musicList) do
-    local id, name = entry:match("(.*)|(.*)")
-    createButton(musicCat, name, function() tocarMusica(id) end)
-end
-createButton(musicCat, "⏹️ Parar Música", function() tocarMusica("") end)
-
--- ========== PLAYER CONTROLS ==========
-local playerCat = createCategory("👤 PLAYER CONTROLS")
--- Input para nome do jogador
-createInput(playerCat, "Nome do jogador (parcial)", function(value)
-    local found = findPlayerByPartialName(value)
-    if found then
-        selectedPlayerName = found.Name
-        StarterGui:SetCore("SendNotification", {Title = "Selecionado", Text = found.Name, Duration = 2})
-    else
-        StarterGui:SetCore("SendNotification", {Title = "Erro", Text = "Jogador não encontrado", Duration = 2})
-    end
-end)
-createButton(playerCat, "📍 Teleportar até player", function()
-    if selectedPlayerName then
-        local target = Players:FindFirstChild(selectedPlayerName)
-        if target and target.Character and target.Character:FindFirstChild("HumanoidRootPart") then
-            local root = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
-            if root then root.CFrame = target.Character.HumanoidRootPart.CFrame end
-        end
-    end
-end)
-createToggle(playerCat, "🧠 Headsit", false, function(state)
-    if state then
-        if not selectedPlayerName then 
-            StarterGui:SetCore("SendNotification", {Title = "Erro", Text = "Selecione um jogador primeiro", Duration = 2})
-            return
-        end
-        local target = Players:FindFirstChild(selectedPlayerName)
-        if target then headsitOnPlayer(target)
-        else state = false end
-    else
-        removeHeadsit()
-    end
-end)
-createSlider(playerCat, "🏃 Velocidade", 16, 300, 16, function(v)
-    local hum = LocalPlayer.Character and LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
-    if hum then hum.WalkSpeed = v end
-end)
-createSlider(playerCat, "🦘 Pulo", 50, 500, 50, function(v)
-    local hum = LocalPlayer.Character and LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
-    if hum then hum.JumpPower = v end
-end)
-createSlider(playerCat, "🌍 Gravidade", 0, 500, 196.2, function(v)
-    workspace.Gravity = v
-end)
-createToggle(playerCat, "♾️ Infinite Jump", false, function(state)
-    infiniteJumpEnabled = state
-end)
-UserInputService.JumpRequest:Connect(function()
-    if infiniteJumpEnabled and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
-        LocalPlayer.Character.Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
-    end
-end)
-createToggle(playerCat, "🪑 Anti-Sit", false, function(state)
-    antiSitEnabled = state
-    local hum = LocalPlayer.Character and LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
-    if hum then
-        hum:SetStateEnabled(Enum.HumanoidStateType.Seated, not state)
-        if state and hum.Sit then hum.Sit = false end
-    end
-end)
-createToggle(playerCat, "🌀 Noclip", false, function(state)
-    noclipEnabled = state
-    if noclipConn then noclipConn:Disconnect() end
-    if state then
-        noclipConn = RunService.Heartbeat:Connect(function()
-            local char = LocalPlayer.Character
-            if char then
-                for _, part in pairs(char:GetDescendants()) do
-                    if part:IsA("BasePart") then part.CanCollide = false end
-                end
-            end
-        end)
-    end
-end)
-createButton(playerCat, "🔁 Resetar Speed/Gravity/Jump", function()
-    local hum = LocalPlayer.Character and LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
-    if hum then
-        hum.WalkSpeed = 16
-        hum.JumpPower = 50
-    end
-    workspace.Gravity = 196.2
-    infiniteJumpEnabled = false
-end)
-
--- ========== ESP ==========
-local espCat = createCategory("👁️ ESP")
-createDropdown(espCat, "Cor do ESP", {"RGB","Vermelho","Verde","Azul","Amarelo","Rosa","Roxo","Branco","Preto"}, function(v)
-    espColor = v
-end)
-createToggle(espCat, "ESP Ativado", false, function(state)
+local espConn = nil
+createToggle("ESP Ativado", false, function(state)
     espEnabled = state
     if state then
         for _, p in pairs(Players:GetPlayers()) do updateESP(p) end
-        Players.PlayerAdded:Connect(updateESP)
-        Players.PlayerRemoving:Connect(removeESP)
-        RunService.Heartbeat:Connect(function()
+        espConn = RunService.Heartbeat:Connect(function()
             for _, p in pairs(Players:GetPlayers()) do
-                if espEnabled then updateESP(p) end
-            end
-            if espColor == "RGB" then
-                for _, p in pairs(Players:GetPlayers()) do
-                    local gui = billboardGuis[p]
-                    if gui and gui:FindFirstChild("TextLabel") then
-                        gui.TextLabel.TextColor3 = getRainbowColor()
+                if espEnabled then
+                    if not billboardGuis[p] then updateESP(p)
+                    elseif billboardGuis[p] and billboardGuis[p]:FindFirstChild("TextLabel") then
+                        billboardGuis[p].TextLabel.TextColor3 = getESPColor()
                     end
                 end
             end
         end)
     else
+        if espConn then espConn:Disconnect() espConn = nil end
         for _, p in pairs(Players:GetPlayers()) do removeESP(p) end
         billboardGuis = {}
     end
 end)
 
--- ========== AVATAR ==========
-local avatarCat = createCategory("👔 AVATAR")
+-- ============================================================
+-- SEÇÃO: AVATAR
+-- ============================================================
+createCategory("👔 AVATAR")
 local targetPlayerName = nil
 local function getPlayerNames()
-    local names = {}
-    for _, p in pairs(Players:GetPlayers()) do if p ~= LocalPlayer then table.insert(names, p.Name) end end
-    return names
+    local n = {}
+    for _, p in pairs(Players:GetPlayers()) do
+        if p ~= lp then table.insert(n, p.Name) end
+    end
+    if #n == 0 then n = {"(nenhum)"} end
+    return n
 end
-local playerDropdown = createDropdown(avatarCat, "Selecionar jogador", getPlayerNames(), function(v)
-    targetPlayerName = v
-end)
-createButton(avatarCat, "🔄 Atualizar lista", function()
-    local newNames = getPlayerNames()
-    playerDropdown.Parent:Destroy()
-    playerDropdown = createDropdown(avatarCat, "Selecionar jogador", newNames, function(v) targetPlayerName = v end)
-end)
-createButton(avatarCat, "📋 Copiar Avatar", function()
-    if not targetPlayerName then return end
+createDropdown("Selecionar jogador", getPlayerNames(), function(v) targetPlayerName = v end)
+createButton("📋 Copiar Avatar", function()
+    if not targetPlayerName then notify("❌", "Selecione um jogador") return end
     local target = Players:FindFirstChild(targetPlayerName)
     if target and target.Character then
-        local LChar = LocalPlayer.Character
-        local LHum = LChar and LChar:FindFirstChildOfClass("Humanoid")
+        local LHum = lp.Character and lp.Character:FindFirstChildOfClass("Humanoid")
         local THum = target.Character:FindFirstChildOfClass("Humanoid")
         if LHum and THum then
-            local Remotes = ReplicatedStorage:WaitForChild("Remotes")
+            local ok, Remotes = pcall(function() return ReplicatedStorage:WaitForChild("Remotes", 3) end)
+            if not ok or not Remotes then notify("❌", "Remotes não encontrado") return end
             local PDesc = THum:GetAppliedDescription()
-            local bodyArgs = {{ PDesc.Torso, PDesc.RightArm, PDesc.LeftArm, PDesc.RightLeg, PDesc.LeftLeg, PDesc.Head }}
-            pcall(Remotes.ChangeCharacterBody.InvokeServer, Remotes.ChangeCharacterBody, unpack(bodyArgs))
+            pcall(function() Remotes.ChangeCharacterBody:InvokeServer({PDesc.Torso,PDesc.RightArm,PDesc.LeftArm,PDesc.RightLeg,PDesc.LeftLeg,PDesc.Head}) end)
             task.wait(0.5)
-            if PDesc.Shirt and tonumber(PDesc.Shirt) then pcall(Remotes.Wear.InvokeServer, Remotes.Wear, tonumber(PDesc.Shirt)) end
-            if PDesc.Pants and tonumber(PDesc.Pants) then pcall(Remotes.Wear.InvokeServer, Remotes.Wear, tonumber(PDesc.Pants)) end
-            if PDesc.Face and tonumber(PDesc.Face) then pcall(Remotes.Wear.InvokeServer, Remotes.Wear, tonumber(PDesc.Face)) end
+            for _, v in ipairs({PDesc.Shirt, PDesc.Pants, PDesc.Face}) do
+                if v and tonumber(v) then pcall(function() Remotes.Wear:InvokeServer(tonumber(v)) end) end
+            end
             for _, acc in ipairs(PDesc:GetAccessories(true)) do
                 if acc.AssetId and tonumber(acc.AssetId) then
-                    pcall(Remotes.Wear.InvokeServer, Remotes.Wear, tonumber(acc.AssetId))
-                    task.wait(0.2)
+                    pcall(function() Remotes.Wear:InvokeServer(tonumber(acc.AssetId)) end)
+                    task.wait(0.15)
                 end
             end
-            StarterGui:SetCore("SendNotification", {Title = "Avatar copiado", Text = target.Name, Duration = 3})
+            notify("✅ Avatar copiado", target.Name)
         end
     end
 end)
 
 -- Roupas 3D
-local roupas3dCat = createCategory("🎭 Roupas 3D")
+createCategory("🎭 Roupas 3D")
 local avatares = {
-    "Gato de Manga|124948425515124", "Tung Saur|117098257036480", "Tralaleiro|99459753608381",
-    "Monstro S.A|123609977175226", "Trenzinho|80468697076178", "Dino|11941741105",
-    "Pou idoso|15742966010", "Coco/boxt@|77013984520332", "Coelho|71797333686800"
+    {"Gato de Manga", "124948425515124"}, {"Tung Saur", "117098257036480"}, {"Tralaleiro", "99459753608381"},
+    {"Monstro S.A", "123609977175226"}, {"Trenzinho", "80468697076178"}, {"Dino", "11941741105"},
+    {"Pou idoso", "15742966010"}, {"Coco/boxt@", "77013984520332"}, {"Coelho", "71797333686800"}
 }
-local avatarNames = {}
-local avatarIds = {}
-for _, a in ipairs(avatares) do
-    local name, id = a:match("(.*)|(.*)")
-    table.insert(avatarNames, name)
-    avatarIds[name] = id
-end
-local selected3D = nil
-local dropdown3D = createDropdown(roupas3dCat, "Selecionar roupa", avatarNames, function(v) selected3D = v end)
-createButton(roupas3dCat, "👕 Equipar", function()
-    if selected3D and avatarIds[selected3D] then
-        local Remotes = ReplicatedStorage:WaitForChild("Remotes")
-        pcall(Remotes.Wear.InvokeServer, Remotes.Wear, tonumber(avatarIds[selected3D]))
-        StarterGui:SetCore("SendNotification", {Title = "Equipado", Text = selected3D, Duration = 2})
+local avNames = {}
+local avIds = {}
+for _, a in ipairs(avatares) do avNames[#avNames+1] = a[1] avIds[a[1]] = a[2] end
+local sel3D = nil
+createDropdown("Selecionar roupa", avNames, function(v) sel3D = v end)
+createButton("👕 Equipar", function()
+    if not sel3D then return end
+    local ok, Remotes = pcall(function() return ReplicatedStorage:WaitForChild("Remotes", 3) end)
+    if ok and Remotes then
+        pcall(function() Remotes.Wear:InvokeServer(tonumber(avIds[sel3D])) end)
+        notify("✅ Equipado", sel3D)
     end
 end)
 
--- ========== CASA ==========
-local houseCat = createCategory("🏠 CASA")
-createButton(houseCat, "🗑️ Remover Ban de Todas as Casas", function()
+-- ============================================================
+-- SEÇÃO: CASA
+-- ============================================================
+createCategory("🏠 CASA")
+createButton("🗑️ Remover Ban de Todas as Casas", function()
     local count = 0
-    for _, obj in ipairs(workspace:GetDescendants()) do
-        if obj.Name:match("BannedBlock") then
-            pcall(obj.Destroy, obj)
-            count = count + 1
-        end
+    for _, obj in pairs(workspace:GetDescendants()) do
+        if obj.Name:match("BannedBlock") then pcall(function() obj:Destroy() end) count += 1 end
     end
-    StarterGui:SetCore("SendNotification", {Title = "Bans removidos", Text = count.." blocos deletados", Duration = 3})
+    notify("Bans removidos", count .. " blocos deletados")
 end)
-local teleportHouseCat = createCategory("🏠 Teleportes Rápidos")
+
+createCategory("📍 Teleportes Rápidos")
 local casas = {
-    "Casa 1|260.29,4.37,209.32", "Casa 2|234.49,4.37,228.00", "Casa 3|262.79,21.37,210.84",
-    "Casa 5|173.44,21.37,228.11", "Casa 11|-21,40,436", "Casa 15|148,39,387"
+    {"Casa 1", Vector3.new(260.29, 4.37, 209.32)},
+    {"Casa 2", Vector3.new(234.49, 4.37, 228.00)},
+    {"Casa 3", Vector3.new(262.79, 21.37, 210.84)},
+    {"Casa 5", Vector3.new(173.44, 21.37, 228.11)},
+    {"Casa 11", Vector3.new(-21, 40, 436)},
+    {"Casa 15", Vector3.new(148, 39, 387)},
 }
-for _, casa in ipairs(casas) do
-    local nome, posStr = casa:match("(.*)|(.*)")
-    local x,y,z = posStr:match("([^,]+),([^,]+),([^,]+)")
-    local pos = Vector3.new(tonumber(x), tonumber(y), tonumber(z))
-    createButton(teleportHouseCat, nome, function()
-        local root = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+for _, c in ipairs(casas) do
+    local nome, pos = c[1], c[2]
+    createButton("🏠 " .. nome, function()
+        local root = lp.Character and lp.Character:FindFirstChild("HumanoidRootPart")
         if root then root.CFrame = CFrame.new(pos) end
     end)
 end
 
--- ========== CARROS ==========
-local carCat = createCategory("🚗 CARROS")
-createButton(carCat, "❌ Remover todos os carros", function()
-    ReplicatedStorage:WaitForChild("RE"):WaitForChild("1Ca1r"):FireServer("DeleteAllVehicles")
+-- ============================================================
+-- SEÇÃO: CARROS
+-- ============================================================
+createCategory("🚗 CARROS")
+createButton("❌ Remover todos os carros", function()
+    local RE = ReplicatedStorage:FindFirstChild("RE")
+    if RE and RE:FindFirstChild("1Ca1r") then
+        pcall(function() RE["1Ca1r"]:FireServer("DeleteAllVehicles") end)
+    end
 end)
-createButton(carCat, "📦 Trazer todos os carros", function()
-    local pos = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") and LocalPlayer.Character.HumanoidRootPart.Position
+createButton("📦 Trazer todos os carros", function()
+    local pos = lp.Character and lp.Character:FindFirstChild("HumanoidRootPart") and lp.Character.HumanoidRootPart.Position
     if pos then
-        for _, veh in pairs(workspace.Vehicles:GetChildren()) do
-            if veh:IsA("Model") and veh.PrimaryPart then
-                veh:SetPrimaryPartCFrame(CFrame.new(pos + Vector3.new(math.random(-10,10), 2, math.random(-10,10))))
+        local veh = workspace:FindFirstChild("Vehicles")
+        if veh then
+            for _, v in pairs(veh:GetChildren()) do
+                if v:IsA("Model") and v.PrimaryPart then
+                    pcall(function() v:SetPrimaryPartCFrame(CFrame.new(pos + Vector3.new(math.random(-10,10), 2, math.random(-10,10)))) end)
+                end
             end
         end
     end
 end)
-createInput(carCat, "Velocidade do seu carro (ex: 80)", function(value)
+createInput("Velocidade do carro (ex: 80)", function(value)
     local speed = tonumber(value) or 50
-    local car = workspace.Vehicles:FindFirstChild(LocalPlayer.Name.."Car")
-    if car and car.Body and car.Body:FindFirstChild("VehicleSeat") then
-        car.Body.VehicleSeat.TopSpeed.Value = speed
-        StarterGui:SetCore("SendNotification", {Title = "Velocidade", Text = tostring(speed), Duration = 2})
-    end
-end)
-local carSelectCat = createCategory("🚙 Selecionar Carro")
-local selectedCarName = nil
-local function getCarList()
-    local cars = {}
     local veh = workspace:FindFirstChild("Vehicles")
     if veh then
-        for _, c in pairs(veh:GetChildren()) do
-            if c.Name:match("Car$") then table.insert(cars, c.Name) end
+        local car = veh:FindFirstChild(lp.Name .. "Car")
+        if car and car:FindFirstChild("Body") and car.Body:FindFirstChild("VehicleSeat") then
+            local ts = car.Body.VehicleSeat:FindFirstChild("TopSpeed")
+            if ts then ts.Value = speed end
         end
     end
-    if #cars == 0 then cars = {"Nenhum carro"} end
-    return cars
-end
-local carDropdown = createDropdown(carSelectCat, "Selecione", getCarList(), function(v) selectedCarName = v end)
-createButton(carSelectCat, "🔄 Atualizar lista", function()
-    carDropdown.Parent:Destroy()
-    carDropdown = createDropdown(carSelectCat, "Selecione", getCarList(), function(v) selectedCarName = v end)
-end)
-createButton(carSelectCat, "📥 Trazer carro selecionado", function()
-    if selectedCarName and selectedCarName ~= "Nenhum carro" then
-        local veh = workspace.Vehicles:FindFirstChild(selectedCarName)
-        if veh and veh.PrimaryPart then
-            local pos = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") and LocalPlayer.Character.HumanoidRootPart.Position
-            if pos then veh:SetPrimaryPartCFrame(CFrame.new(pos + Vector3.new(5,0,5))) end
-        end
-    end
+    notify("Velocidade", tostring(speed))
 end)
 
--- ========== RGB ==========
-local rgbCat = createCategory("🌈 RGB")
-createSlider(rgbCat, "Velocidade RGB", 1, 10, 3, function(v) rgbSpeed = v end)
-createToggle(rgbCat, "✨ Nome + Bio RGB", false, function(state)
+-- ============================================================
+-- SEÇÃO: RGB
+-- ============================================================
+createCategory("🌈 RGB")
+createSlider("Velocidade RGB", 1, 10, 3, function(v) rgbSpeed = v end)
+createToggle("✨ Nome + Bio RGB", false, function(state)
     nameBioActive = state
     task.spawn(function()
         while nameBioActive do
             local col = getRainbowColor()
-            fireServerRGB("1RPNam1eColo1r", "PickingRPNameColor", col)
-            fireServerRGB("1RPNam1eColo1r", "PickingRPBioColor", col)
+            fireServerRE("1RPNam1eColo1r", "PickingRPNameColor", col)
+            fireServerRE("1RPNam1eColo1r", "PickingRPBioColor", col)
             task.wait(0.1)
         end
     end)
 end)
-createToggle(rgbCat, "🎨 RGB Corpo", false, function(state)
+createToggle("🎨 RGB Corpo", false, function(state)
     corpoRGB = state
     task.spawn(function()
         while corpoRGB do
-            local remote = ReplicatedStorage:FindFirstChild("Remotes")
-            if remote and remote:FindFirstChild("ChangeBodyColor") then
-                pcall(remote.ChangeBodyColor.FireServer, remote.ChangeBodyColor, {BrickColor.new(getRainbowColor())})
+            local ok, Remotes = pcall(function() return ReplicatedStorage:WaitForChild("Remotes", 1) end)
+            if ok and Remotes and Remotes:FindFirstChild("ChangeBodyColor") then
+                pcall(function() Remotes.ChangeBodyColor:FireServer({BrickColor.new(getRainbowColor())}) end)
             end
             task.wait(0.1)
         end
     end)
 end)
-createToggle(rgbCat, "💇 RGB Cabelo", false, function(state)
+createToggle("💇 RGB Cabelo", false, function(state)
     cabeloRGB = state
     task.spawn(function()
         while cabeloRGB do
-            fireServerRGB("1Max1y", "ChangeHairColor2", getRainbowColor())
+            fireServerRE("1Max1y", "ChangeHairColor2", getRainbowColor())
             task.wait(0.5)
         end
     end)
 end)
-createToggle(rgbCat, "🏠 RGB Casa", false, function(state)
+createToggle("🏠 RGB Casa", false, function(state)
     casaRGB = state
     task.spawn(function()
         while casaRGB do
-            fireServerRGB("1Player1sHous1e", "ColorPickHouse", getRainbowColor())
+            fireServerRE("1Player1sHous1e", "ColorPickHouse", getRainbowColor())
             task.wait(0.1)
         end
     end)
 end)
-createToggle(rgbCat, "🚗 Carro RGB (Premium)", false, function(state)
+createToggle("🚗 Carro RGB", false, function(state)
     carroRGB = state
     task.spawn(function()
         while carroRGB do
-            fireServerRGB("1Player1sCa1r", "PickingCarColor", getRainbowColor())
+            fireServerRE("1Player1sCa1r", "PickingCarColor", getRainbowColor())
             task.wait(0.1)
         end
     end)
 end)
-createToggle(rgbCat, "🚲 RGB Bicicleta", false, function(state)
+createToggle("🚲 Bicicleta RGB", false, function(state)
     bikeRGB = state
     task.spawn(function()
         while bikeRGB do
-            fireServerRGB("1Player1sCa1r", "NoMotorColor", getRainbowColor())
-            task.wait(0.1)
-        end
-    end)
-end)
-createToggle(rgbCat, "📻 Rádio RGB", false, function(state)
-    radioRGB = state
-    task.spawn(function()
-        while radioRGB do
-            local col = getRainbowColor()
-            local remote = pcall(function()
-                return LocalPlayer:WaitForChild("PlayerGui"):WaitForChild("ToolGui"):WaitForChild("ToolSettings"):WaitForChild("Settings"):WaitForChild("PropsColor"):WaitForChild("SetColor")
-            end)
-            if remote and remote then pcall(remote.FireServer, remote, col) end
+            fireServerRE("1Player1sCa1r", "NoMotorColor", getRainbowColor())
             task.wait(0.1)
         end
     end)
 end)
 
--- ========== MUSIC ALL ==========
-local musicAllCat = createCategory("🎶 MÚSICA GLOBAL")
-createInput(musicAllCat, "ID da música manual", function(value)
-    if value and value ~= "" then tocarMusica(tostring(value)) end
+-- ============================================================
+-- SEÇÃO: MÚSICA GLOBAL
+-- ============================================================
+createCategory("🎶 MÚSICA GLOBAL")
+createInput("ID da música manual", function(v)
+    currentMusicID = v
+    tocarMusica(v)
 end)
-createToggle(musicAllCat, "🔄 Loop Música", false, function(state)
+createToggle("🔄 Loop Música", false, function(state)
     loopAllActive = state
-    if state then
-        task.spawn(function()
-            while loopAllActive do
-                if currentMusicID and currentMusicID ~= "" then tocarMusica(currentMusicID) end
-                task.wait(1)
-            end
-        end)
+    task.spawn(function()
+        while loopAllActive do
+            if currentMusicID ~= "" then tocarMusica(currentMusicID) end
+            task.wait(1)
+        end
+    end)
+end)
+
+-- ============================================================
+-- SEÇÃO: TROLL MÚSICAS (Playlists)
+-- ============================================================
+createCategory("🎤 PLAYLISTS")
+
+local function makePlaylist(label, list)
+    local names, ids = {}, {}
+    for _, e in ipairs(list) do
+        local name, id = e[1], e[2]
+        names[#names+1] = name
+        ids[name] = id
     end
-end)
-
--- ========== TROLL MÚSICA (Dropdowns adicionais) ==========
-local trollMusicCat = createCategory("🎤 TROLL MÚSICA (Playlists)")
-
--- Forró
-local forroList = {
-    "forró ja cansou|74812784884330", "lenbro ate hoje|71531533552899", "escolha certa|107088620814881",
-    "forró da rezenha|120973520531216", "forró dudu|74404168179733", "forró sao joao|106364874935196",
-    "forró engraçado paia|76524290482399", "100% forro vaquejada|92295159623916",
-    "PASTOR MIRIM|71153532555470", "PARA NÃO ESQUECER|88937498361674", "Uno zero|112959083808887",
-    "Iate do neymar|135738534706063", "Batidao na aldeia|79953696595578"
-}
-local forroNames = {}
-local forroIds = {}
-for _, entry in ipairs(forroList) do
-    local name, id = entry:match("(.*)|(.*)")
-    table.insert(forroNames, name)
-    forroIds[name] = id
+    createDropdown("🎵 " .. label, names, function(v)
+        if ids[v] then tocarMusica(ids[v]) end
+    end)
 end
-local forroDropdown = createDropdown(trollMusicCat, "🎵 Forró", forroNames, function(v)
-    if v and forroIds[v] then tocarMusica(forroIds[v]) end
-end)
 
--- Funk
-local funkList = {
-    "sua mulher funk|90844637105538", "fuga na viatura|131891110268352", "funkphonk fumando verde|112143944982807",
-    "cauma xmara|95664293972405", "que que sharke|129546408528391", "Il Cacto Hipopotamo|104491656009142",
-    "Espressora Signora|123394392737234", "trippi troop funk|73049389767013", "bombini funkphonk|88814770244609",
-    "pre treino|136869502216760", "CVRL|124244582950595", "Dança do Canguru|86876136192157",
-    "MONTAGEM ARABIANA|78076624091098", "Manda o papo|132642647937688", "SENTA|124085422276732",
-    "TUNG TUNG TUNG|120353876640055", "CAPPUCCINO ASSASSINO|132733033157915"
-}
-local funkNames = {}
-local funkIds = {}
-for _, entry in ipairs(funkList) do
-    local name, id = entry:match("(.*)|(.*)")
-    table.insert(funkNames, name)
-    funkIds[name] = id
-end
-local funkDropdown = createDropdown(trollMusicCat, "🎵 Funk", funkNames, function(v)
-    if v and funkIds[v] then tocarMusica(funkIds[v]) end
-end)
+makePlaylist("Forró", {
+    {"forró ja cansou","74812784884330"},{"lenbro ate hoje","71531533552899"},{"escolha certa","107088620814881"},
+    {"forró da rezenha","120973520531216"},{"forró dudu","74404168179733"},{"forró sao joao","106364874935196"},
+    {"forró engraçado paia","76524290482399"},{"100% forro vaquejada","92295159623916"},
+    {"PASTOR MIRIM","71153532555470"},{"PARA NÃO ESQUECER","88937498361674"},
+    {"Uno zero","112959083808887"},{"Iate do neymar","135738534706063"},{"Batidao na aldeia","79953696595578"}
+})
+makePlaylist("Funk", {
+    {"sua mulher funk","90844637105538"},{"fuga na viatura","131891110268352"},{"funkphonk fumando verde","112143944982807"},
+    {"cauma xmara","95664293972405"},{"que que sharke","129546408528391"},{"Il Cacto Hipopotamo","104491656009142"},
+    {"Espressora Signora","123394392737234"},{"trippi troop funk","73049389767013"},{"bombini funkphonk","88814770244609"},
+    {"pre treino","136869502216760"},{"CVRL","124244582950595"},{"Dança do Canguru","86876136192157"},
+    {"MONTAGEM ARABIANA","78076624091098"},{"Manda o papo","132642647937688"},{"SENTA","124085422276732"},
+    {"TUNG TUNG TUNG","120353876640055"},{"CAPPUCCINO ASSASSINO","132733033157915"}
+})
+makePlaylist("Phonk", {
+    {"wyles","85385155970460"},{"phonk kawai","91502410121438"},{"vem no pocpoc","102333419023382"},
+    {"phonk osadia","88033569921555"},{"phonk sarra","132436320685732"},{"phonk sexoagressivo","111995323199676"},
+    {"phonk ALL THE TIME","123809083385992"},{"Lifelong Memory","81929101024622"},{"MONTAGEM BIONICA DIAMANTE","122338822665007"},
+    {"BALA SELVAGEM!","96180057167470"},{"MONTAGEM SOLAR TROPICANO","116461681407294"},
+    {"BRAZIL DO FUNK","133498554139200"},{"FUNK DO RAVE 1.0","137135395010424"},{"HIPNOTIZA","132015050363205"},{"CRISTAL","103445348511856"}
+})
+makePlaylist("Memes", {
+    {"ANXIETY","101483901475189"},{"Meu corpo minhas regras","127587901595282"},{"Megalovania","104500091160463"},
+    {"Bamm Bamm","128730685516895"},{"chupa cabra","132890273173295"},{"Garoto de Copacabana","135648634110254"},
+    {"CELL!","117634275895085"},{"carro do ovo","3148329638"},{"ingles bus","123268013026823"},
+    {"MIKU MIKU HATSUNE","112783541496955"},{"Rat Dance","133496635668044"}
+})
 
--- Phonk
-local phonkList = {
-    "wyles|85385155970460", "phonk kawai|91502410121438", "vem no pocpoc|102333419023382",
-    "phonk osadia|88033569921555", "phonk sarra|132436320685732", "phonk sexoagreçivo|111995323199676",
-    "phonk ALL THE TIME|123809083385992", "Lifelong Memory|81929101024622", "MONTAGEM BIONICA DIAMANTE|122338822665007",
-    "BALA SELVAGEM!|96180057167470", "MONTAGEM SOLAR TROPICANO|116461681407294", "BRAZIL DO FUNK|133498554139200",
-    "FUNK DO RAVE 1.0|137135395010424", "HIPNOTIZA|132015050363205", "CRISTAL|103445348511856"
-}
-local phonkNames = {}
-local phonkIds = {}
-for _, entry in ipairs(phonkList) do
-    local name, id = entry:match("(.*)|(.*)")
-    table.insert(phonkNames, name)
-    phonkIds[name] = id
-end
-local phonkDropdown = createDropdown(trollMusicCat, "🎵 Phonk", phonkNames, function(v)
-    if v and phonkIds[v] then tocarMusica(phonkIds[v]) end
-end)
-
--- Aleatório/Memes
-local memeList = {
-    "ANXIETY|101483901475189", "Meu corpo, minhas regras|127587901595282", "Megalovania|104500091160463",
-    "Bamm Bamm|128730685516895", "chupa cabra|132890273173295", "Garoto de Copacabana|135648634110254",
-    "CELL!|117634275895085", "carro do ovo|3148329638", "ingles bus|123268013026823",
-    "MIKU MIKU HATSUNE|112783541496955", "Rat Dance|133496635668044"
-}
-local memeNames = {}
-local memeIds = {}
-for _, entry in ipairs(memeList) do
-    local name, id = entry:match("(.*)|(.*)")
-    table.insert(memeNames, name)
-    memeIds[name] = id
-end
-local memeDropdown = createDropdown(trollMusicCat, "🎵 Memes", memeNames, function(v)
-    if v and memeIds[v] then tocarMusica(memeIds[v]) end
-end)
-
--- ========== BOTÃO FLUTUANTE PARA MOBILE ==========
-local mobileButtonGui = Instance.new("ScreenGui")
-mobileButtonGui.Name = "67HubMobileBtn"
-mobileButtonGui.Parent = game.CoreGui
+-- ============================================================
+-- BOTÃO MOBILE FLUTUANTE
+-- ============================================================
+local oldMobile = game.CoreGui:FindFirstChild("67HubMobileBtn")
+if oldMobile then oldMobile:Destroy() end
+local mobileGui = Instance.new("ScreenGui")
+mobileGui.Name = "67HubMobileBtn"
+mobileGui.ResetOnSpawn = false
+mobileGui.Parent = game.CoreGui
 local mobileBtn = Instance.new("TextButton")
-mobileBtn.Size = UDim2.new(0, 55, 0, 55)
-mobileBtn.Position = UDim2.new(1, -65, 0.5, -27)
-mobileBtn.BackgroundColor3 = Color3.fromRGB(220,50,50)
+mobileBtn.Size = UDim2.new(0, 52, 0, 52)
+mobileBtn.Position = UDim2.new(1, -62, 0.5, -26)
+mobileBtn.BackgroundColor3 = Color3.fromRGB(220, 50, 50)
 mobileBtn.Text = "67"
 mobileBtn.TextColor3 = Color3.new(1,1,1)
 mobileBtn.Font = Enum.Font.GothamBold
-mobileBtn.TextSize = 20
+mobileBtn.TextSize = 18
 mobileBtn.Draggable = true
-local cornerBtn = Instance.new("UICorner")
-cornerBtn.CornerRadius = UDim.new(1,0)
-cornerBtn.Parent = mobileBtn
-mobileBtn.Parent = mobileButtonGui
+mobileBtn.BorderSizePixel = 0
+Instance.new("UICorner", mobileBtn).CornerRadius = UDim.new(1, 0)
+mobileBtn.Parent = mobileGui
 local uiVisible = true
 mobileBtn.MouseButton1Click:Connect(function()
     uiVisible = not uiVisible
-    gui.Enabled = uiVisible
-    mobileBtn.Text = uiVisible and "67" or "X"
+    screenGui.Enabled = uiVisible
 end)
 
--- Finalização
-updateCanvas()
-StarterGui:SetCore("SendNotification", {Title = "✅ 67 HUB", Text = "Carregado com UI LocalMaze! Arraste pelo título vermelho.", Duration = 5})
-print("✅ 67 HUB - UI LocalMaze com todas as funcionalidades carregado!")
+-- ============================================================
+notify("✅ 67 HUB", "Carregado! Arraste pelo título vermelho.")
+print("✅ 67 HUB - Carregado com sucesso!")
