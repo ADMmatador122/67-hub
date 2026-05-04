@@ -1,9 +1,9 @@
--- 67 HUB - Kavo UI Edition
+-- 67 HUB - Rayfield Edition (Completo)
 -- by yuki/ADM_TROLLKKS
--- Funções completas + todas as músicas
+-- Inclui: Loading screen, Headsit, ESP, Noclip, Fly, RGB, Carros, Casas, Avatar Copy, Musicas, etc.
 
 -- ============================================================
--- TELA DE LOADING
+-- TELA DE LOADING (mantida do original)
 -- ============================================================
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
@@ -15,6 +15,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local VirtualInputManager = game:GetService("VirtualInputManager")
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
+local TeleportService = game:GetService("TeleportService")
 
 local function createLoadingScreen()
     local promise = {completed = false}
@@ -71,7 +72,7 @@ local function createLoadingScreen()
             sound.PlayOnRemove = true
             sound.Parent = workspace
             sound:Destroy()
-            StarterGui:SetCore("SendNotification", {Title = "67 HUB", Text = "Bem-vindo à 67 HUB!", Duration = 4})
+            StarterGui:SetCore("SendNotification", {Title = "67 HUB", Text = "Bem-vindo!", Duration = 4})
             promise.completed = true
             gui:Destroy()
         end)
@@ -82,10 +83,22 @@ local loadingPromise = createLoadingScreen()
 while not loadingPromise.completed do task.wait() end
 
 -- ============================================================
--- CARREGAR KAVO UI
+-- CARREGAR RAYFIELD
 -- ============================================================
-local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
-local Window = Library.CreateLib("67 HUB", "DarkTheme")
+local Rayfield = loadstring(game:HttpGet('https://raw.githubusercontent.com/shlexware/Rayfield/main/source'))()
+local Window = Rayfield:CreateWindow({
+    Name = "67 HUB",
+    Icon = 0,
+    LoadingTitle = "67 HUB",
+    LoadingSubtitle = "by yuki/ADM_TROLLKKS",
+    Theme = "Default",
+    ConfigurationSaving = {
+        Enabled = true,
+        FolderName = "67Hub",
+        FileName = "Settings"
+    },
+    KeySystem = false,
+})
 
 -- ============================================================
 -- VARIÁVEIS GLOBAIS
@@ -100,10 +113,18 @@ local infiniteJumpEnabled = false
 local antiSitEnabled = false
 local noclipEnabled = false
 local noclipConnections = {}
-local flingActive = false
 local selectedVehicle = nil
 local currentMusicID = ""
 local loopAllActive = false
+local rgbSpeed = 3
+local nameBioActive = false
+local corpoRGB = false
+local cabeloRGB = false
+local casaRGB = false
+local carroRGB = false
+local bikeRGB = false
+local radioRGB = false
+local megafoneRGB = false
 
 -- ============================================================
 -- FUNÇÕES AUXILIARES
@@ -152,9 +173,8 @@ local function removeHeadsit()
     if humanoid then humanoid.Sit = false end
 end
 
-local function getRainbowColor(speed)
-    speed = speed or 3
-    local h = (tick() * speed % 5) / 5
+local function getRainbowColor()
+    local h = (tick() * rgbSpeed % 5) / 5
     return Color3.fromHSV(h, 1, 1)
 end
 
@@ -167,7 +187,7 @@ end
 
 -- ESP
 local function getESPColor()
-    if espColor == "RGB" then return getRainbowColor(2)
+    if espColor == "RGB" then return getRainbowColor()
     elseif espColor == "Preto" then return Color3.fromRGB(0,0,0)
     elseif espColor == "Branco" then return Color3.fromRGB(255,255,255)
     elseif espColor == "Vermelho" then return Color3.fromRGB(255,0,0)
@@ -227,36 +247,30 @@ local function managePlayerCollisions(character)
 end
 
 -- ============================================================
--- ABA 1: INFO
+-- GUI: TABS E SECTIONS
 -- ============================================================
-local InfoTab = Window:NewTab("Info")
-local InfoSection = InfoTab:NewSection("Informações")
-InfoSection:NewParagraph("67 HUB", "Versão completa com Kavo UI\nTela de loading integrada")
-InfoSection:NewButton("Rejoin", "Reconecta ao servidor", function()
-    game:GetService("TeleportService"):TeleportToPlaceInstance(game.PlaceId, game.JobId, LocalPlayer)
-end)
+local InfoTab = Window:CreateTab("Info", 0)
+local InfoSection = InfoTab:CreateSection("Informações")
+InfoSection:CreateParagraph("67 HUB", "Versão completa com Rayfield\nTela de loading integrada")
+InfoSection:CreateButton({Name = "Rejoin", Callback = function() TeleportService:TeleportToPlaceInstance(game.PlaceId, game.JobId, LocalPlayer) end})
 
--- ============================================================
--- ABA 2: FUN (Player Character)
--- ============================================================
-local FunTab = Window:NewTab("Fun")
-local PlayerSection = FunTab:NewSection("Player Character")
+-- ========== TAB FUN ==========
+local FunTab = Window:CreateTab("Fun", 1)
+local PlayerSection = FunTab:CreateSection("Player Character")
 
 -- Headsit
-PlayerSection:NewTextBox("Nome do Jogador", "Digite parte do nome", function(value)
+FunTab:CreateInput({Name = "Nome do Jogador", PlaceholderText = "Digite parte do nome", Callback = function(value)
     local found = findPlayerByPartialName(value)
     if found then
         selectedPlayerName = found.Name
-        StarterGui:SetCore("SendNotification", {Title = "Player Selecionado", Text = found.Name, Duration = 3})
+        Rayfield:Notify({Title = "Player Selecionado", Content = found.Name, Duration = 3})
     else
-        warn("Jogador não encontrado")
+        Rayfield:Notify({Title = "Erro", Content = "Jogador não encontrado", Duration = 2})
     end
-end)
-
-local headsitToggle = PlayerSection:NewToggle("Headsit", "Senta na cabeça do player", function(state)
+end})
+PlayerSection:CreateToggle({Name = "Headsit", CurrentValue = false, Callback = function(state)
     if not selectedPlayerName then
-        StarterGui:SetCore("SendNotification", {Title = "Erro", Text = "Selecione um jogador primeiro", Duration = 2})
-        headsitToggle:Set(false)
+        Rayfield:Notify({Title = "Erro", Content = "Selecione um jogador primeiro", Duration = 2})
         return
     end
     if state then
@@ -264,31 +278,31 @@ local headsitToggle = PlayerSection:NewToggle("Headsit", "Senta na cabeça do pl
         if target and headsitOnPlayer(target) then
             headsitActive = true
         else
-            headsitToggle:Set(false)
+            PlayerSection:SetToggle(false)
         end
     else
         removeHeadsit()
         headsitActive = false
     end
-end)
+end})
 
-PlayerSection:NewSlider("Speed Player", "Velocidade de andar", 16, 888, 16, function(v)
+PlayerSection:CreateSlider({Name = "Speed Player", Range = {16, 888}, Increment = 1, CurrentValue = 16, Callback = function(v)
     local char = LocalPlayer.Character
     local hum = char and char:FindFirstChildOfClass("Humanoid")
     if hum then hum.WalkSpeed = v end
-end)
-PlayerSection:NewSlider("Jump Power", "Força do pulo", 50, 500, 50, function(v)
+end})
+PlayerSection:CreateSlider({Name = "Jump Power", Range = {50, 500}, Increment = 1, CurrentValue = 50, Callback = function(v)
     local char = LocalPlayer.Character
     local hum = char and char:FindFirstChildOfClass("Humanoid")
     if hum then hum.JumpPower = v end
-end)
-PlayerSection:NewSlider("Gravity", "Gravidade do jogo", 0, 10000, 196.2, function(v)
+end})
+PlayerSection:CreateSlider({Name = "Gravity", Range = {0, 10000}, Increment = 1, CurrentValue = 196.2, Callback = function(v)
     workspace.Gravity = v
-end)
+end})
 
-PlayerSection:NewToggle("Infinite Jump", "Pulo infinito", function(state)
+PlayerSection:CreateToggle({Name = "Infinite Jump", CurrentValue = false, Callback = function(state)
     infiniteJumpEnabled = state
-end)
+end})
 UserInputService.JumpRequest:Connect(function()
     if infiniteJumpEnabled then
         local char = LocalPlayer.Character
@@ -298,7 +312,7 @@ UserInputService.JumpRequest:Connect(function()
     end
 end)
 
-PlayerSection:NewButton("Reset Speed/Gravity/Jump", "Restaura valores padrão", function()
+PlayerSection:CreateButton({Name = "Reset Speed/Gravity/Jump", Callback = function()
     local char = LocalPlayer.Character
     local hum = char and char:FindFirstChildOfClass("Humanoid")
     if hum then
@@ -307,10 +321,9 @@ PlayerSection:NewButton("Reset Speed/Gravity/Jump", "Restaura valores padrão", 
     end
     workspace.Gravity = 196.2
     infiniteJumpEnabled = false
-end)
+end})
 
--- Anti-Sit
-PlayerSection:NewToggle("Anti-Sit", "Impede de sentar", function(state)
+PlayerSection:CreateToggle({Name = "Anti-Sit", CurrentValue = false, Callback = function(state)
     antiSitEnabled = state
     local function applyAntiSit(character)
         local humanoid = character:FindFirstChild("Humanoid")
@@ -337,10 +350,9 @@ PlayerSection:NewToggle("Anti-Sit", "Impede de sentar", function(state)
         local hum = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid")
         if hum then hum:SetStateEnabled(Enum.HumanoidStateType.Seated, true) end
     end
-end)
+end})
 
--- Ultimate Noclip
-local noclipToggle = PlayerSection:NewToggle("Ultimate Noclip", "Atravessar paredes + proteção", function(state)
+PlayerSection:CreateToggle({Name = "Ultimate Noclip", CurrentValue = false, Callback = function(state)
     noclipEnabled = state
     if state then
         noclipConnections.Heartbeat = RunService.Heartbeat:Connect(function()
@@ -356,16 +368,16 @@ local noclipToggle = PlayerSection:NewToggle("Ultimate Noclip", "Atravessar pare
         noclipConnections = {}
         if LocalPlayer.Character then managePlayerCollisions(LocalPlayer.Character) end
     end
-end)
+end})
 
-PlayerSection:NewButton("Fly GUI", "Carrega GUI de voo universal", function()
+PlayerSection:CreateButton({Name = "Fly GUI", Callback = function()
     loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-Fly-gui-v3-30439"))()
-end)
+end})
 
 -- ESP Section
-local ESPSection = FunTab:NewSection("ESP")
-ESPSection:NewDropdown("Cor do ESP", {"RGB","Branco","Preto","Vermelho","Verde","Azul","Amarelo","Rosa","Roxo"}, function(v) espColor = v end)
-ESPSection:NewToggle("ESP Ativado", "Mostra informações dos players", function(state)
+local ESPSection = FunTab:CreateSection("ESP")
+ESPSection:CreateDropdown({Name = "Cor do ESP", Options = {"RGB","Branco","Preto","Vermelho","Verde","Azul","Amarelo","Rosa","Roxo"}, CurrentOption = "RGB", Callback = function(v) espColor = v end})
+ESPSection:CreateToggle({Name = "ESP Ativado", CurrentValue = false, Callback = function(state)
     espEnabled = state
     if state then
         for _, plr in pairs(Players:GetPlayers()) do updateESP(plr) end
@@ -377,7 +389,7 @@ ESPSection:NewToggle("ESP Ativado", "Mostra informações dos players", function
                 for _, plr in pairs(Players:GetPlayers()) do
                     local gui = billboardGuis[plr]
                     if gui and gui:FindFirstChild("TextLabel") then
-                        gui.TextLabel.TextColor3 = getRainbowColor(2)
+                        gui.TextLabel.TextColor3 = getRainbowColor()
                     end
                 end
             end
@@ -386,14 +398,11 @@ ESPSection:NewToggle("ESP Ativado", "Mostra informações dos players", function
         for _, plr in pairs(Players:GetPlayers()) do removeESP(plr) end
         billboardGuis = {}
     end
-end)
+end})
 
--- ============================================================
--- ABA 3: Avatar Editor
--- ============================================================
-local AvatarTab = Window:NewTab("Avatar")
-local CopySection = AvatarTab:NewSection("Copy Avatar")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
+-- ========== TAB AVATAR ==========
+local AvatarTab = Window:CreateTab("Avatar", 2)
+local CopySection = AvatarTab:CreateSection("Copy Avatar")
 local Remotes = ReplicatedStorage:WaitForChild("Remotes")
 local targetPlayerName = nil
 
@@ -402,12 +411,12 @@ local function GetPlayerNames()
     for _, p in pairs(Players:GetPlayers()) do if p.Name ~= LocalPlayer.Name then table.insert(names, p.Name) end end
     return names
 end
-local playerDropdown = CopySection:NewDropdown("Players List", GetPlayerNames(), function(v) targetPlayerName = v end)
-CopySection:NewButton("Atualizar lista", "Atualiza a lista de jogadores", function()
-    playerDropdown:SetOptions(GetPlayerNames())
-end)
 
-CopySection:NewButton("Copy Avatar", "Copia avatar do jogador selecionado", function()
+CopySection:CreateDropdown({Name = "Players List", Options = GetPlayerNames(), CurrentOption = "", Callback = function(v) targetPlayerName = v end})
+CopySection:CreateButton({Name = "Atualizar lista", Callback = function()
+    CopySection:SetDropdownOptions(GetPlayerNames())
+end})
+CopySection:CreateButton({Name = "Copy Avatar", Callback = function()
     if not targetPlayerName then return end
     local target = Players:FindFirstChild(targetPlayerName)
     if target and target.Character then
@@ -435,11 +444,12 @@ CopySection:NewButton("Copy Avatar", "Copia avatar do jogador selecionado", func
             local skinColor = target.Character:FindFirstChild("Body Colors")
             if skinColor then pcall(Remotes.ChangeBodyColor.FireServer, Remotes.ChangeBodyColor, tostring(skinColor.HeadColor)) end
             if tonumber(PDesc.IdleAnimation) then pcall(Remotes.Wear.InvokeServer, Remotes.Wear, tonumber(PDesc.IdleAnimation)) end
+            Rayfield:Notify({Title = "Avatar copiado", Content = target.Name, Duration = 3})
         end
     end
-end)
+end})
 
-local Section3D = AvatarTab:NewSection("Roupas 3D")
+local Section3D = AvatarTab:CreateSection("Roupas 3D")
 local avatares = {
     {Nome="Gato de Manga", ID=124948425515124}, {Nome="Tung Saur", ID=117098257036480},
     {Nome="Tralaleiro", ID=99459753608381}, {Nome="Monstro S.A", ID=123609977175226},
@@ -448,13 +458,14 @@ local avatares = {
     {Nome="Coelho", ID=71797333686800}, {Nome="Hipopótamo", ID=73215892129281},
     {Nome="Ratatui", ID=108557570415453}, {Nome="Galinha", ID=71251793812515},
     {Nome="Pepa pig", ID=92979204778377}, {Nome="pinguin", ID=94944293759578},
-    {Nome="Sid", ID=87442757321244}, {Nome="puga grande", ID=111436158728716}
+    {Nome="Sid", ID=87442757321244}, {Nome="puga grande", ID=111436158728716},
+    {Nome="SHREK AMALDIÇOADO", ID=120960401202173}, {Nome="mosquito grande", ID=108052868536435}
 }
 local avatarNames = {}
 for _, a in ipairs(avatares) do table.insert(avatarNames, a.Nome) end
 local selectedAvatar = nil
-local avatarDropdown = Section3D:NewDropdown("Acessórios 3D", avatarNames, function(v) selectedAvatar = v end)
-Section3D:NewButton("Equipar", "Equipa o acessório 3D", function()
+Section3D:CreateDropdown({Name = "Acessórios 3D", Options = avatarNames, CurrentOption = "", Callback = function(v) selectedAvatar = v end})
+Section3D:CreateButton({Name = "Equipar", Callback = function()
     if not selectedAvatar then return end
     for _, a in ipairs(avatares) do
         if a.Nome == selectedAvatar then
@@ -462,14 +473,12 @@ Section3D:NewButton("Equipar", "Equipa o acessório 3D", function()
             break
         end
     end
-end)
+end})
 
--- ============================================================
--- ABA 4: House
--- ============================================================
-local HouseTab = Window:NewTab("House")
-HouseTab:NewSection("Funções para sua casa")
-HouseTab:NewButton("Remover Ban de Todas as Casas", "Remove blocos de banimento", function()
+-- ========== TAB HOUSE ==========
+local HouseTab = Window:CreateTab("House", 3)
+local HouseSection = HouseTab:CreateSection("Funções para sua casa")
+HouseSection:CreateButton({Name = "Remover Ban de Todas as Casas", Callback = function()
     local count = 0
     for _, obj in ipairs(workspace:GetDescendants()) do
         if obj.Name:match("BannedBlock") then
@@ -477,11 +486,10 @@ HouseTab:NewButton("Remover Ban de Todas as Casas", "Remove blocos de banimento"
             count = count + 1
         end
     end
-    StarterGui:SetCore("SendNotification", {Title = "Bans removidos", Text = tostring(count).." blocos deletados", Duration = 3})
-end)
+    Rayfield:Notify({Title = "Bans removidos", Content = tostring(count).." blocos deletados", Duration = 3})
+end})
 
--- Teleportes rápidos para casas
-local TeleportSection = HouseTab:NewSection("Teleportes Rápidos")
+local TeleportSection = HouseTab:CreateSection("Teleportes Rápidos")
 local casas = {
     ["Casa 1"] = Vector3.new(260.29, 4.37, 209.32),
     ["Casa 2"] = Vector3.new(234.49, 4.37, 228.00),
@@ -491,17 +499,15 @@ local casas = {
     ["Casa 15"] = Vector3.new(148, 39, 387)
 }
 for nome, pos in pairs(casas) do
-    TeleportSection:NewButton(nome, "Teleporta para a casa", function()
+    TeleportSection:CreateButton({Name = nome, Callback = function()
         local root = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
         if root then root.CFrame = CFrame.new(pos) end
-    end)
+    end})
 end
 
--- ============================================================
--- ABA 5: Car
--- ============================================================
-local CarTab = Window:NewTab("Car")
-local CarSection = CarTab:NewSection("Funções de Veículos")
+-- ========== TAB CAR ==========
+local CarTab = Window:CreateTab("Car", 4)
+local CarSection = CarTab:CreateSection("Funções de Veículos")
 
 local function updateCarList()
     local cars = {}
@@ -514,25 +520,22 @@ local function updateCarList()
     return cars
 end
 
-local carDropdown = CarSection:NewDropdown("Selecionar Carro do Jogador", updateCarList(), function(v) selectedVehicle = v end)
-CarSection:NewButton("Atualizar Lista", "Atualiza a lista de carros", function()
-    carDropdown:SetOptions(updateCarList())
-end)
-
-CarSection:NewButton("Remover Todos os Carros", "Remove todos os veículos do servidor", function()
+CarSection:CreateDropdown({Name = "Selecionar Carro do Jogador", Options = updateCarList(), CurrentOption = "", Callback = function(v) selectedVehicle = v end})
+CarSection:CreateButton({Name = "Atualizar Lista", Callback = function()
+    CarSection:SetDropdownOptions(updateCarList())
+end})
+CarSection:CreateButton({Name = "Remover Todos os Carros", Callback = function()
     ReplicatedStorage:WaitForChild("RE"):WaitForChild("1Ca1r"):FireServer("DeleteAllVehicles")
-end)
-
-CarSection:NewButton("Trazer Carro Selecionado", "Teleporta o carro até você", function()
+end})
+CarSection:CreateButton({Name = "Trazer Carro Selecionado", Callback = function()
     if not selectedVehicle then return end
     local veh = workspace.Vehicles:FindFirstChild(selectedVehicle)
     if veh and veh.PrimaryPart then
         local pos = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") and LocalPlayer.Character.HumanoidRootPart.Position
         if pos then veh:SetPrimaryPartCFrame(CFrame.new(pos + Vector3.new(5,0,5))) end
     end
-end)
-
-CarSection:NewButton("Trazer Todos os Carros", "Puxa todos os carros para sua posição", function()
+end})
+CarSection:CreateButton({Name = "Trazer Todos os Carros", Callback = function()
     local pos = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") and LocalPlayer.Character.HumanoidRootPart.Position
     if not pos then return end
     for _, veh in pairs(workspace.Vehicles:GetChildren()) do
@@ -540,91 +543,89 @@ CarSection:NewButton("Trazer Todos os Carros", "Puxa todos os carros para sua po
             veh:SetPrimaryPartCFrame(CFrame.new(pos + Vector3.new(math.random(-10,10), 0, math.random(-10,10))))
         end
     end
-end)
-
-CarSection:NewTextBox("Velocidade do Carro", "Digite um valor (ex: 80)", function(value)
+end})
+CarSection:CreateInput({Name = "Velocidade do Carro", PlaceholderText = "Digite um valor (ex: 80)", Callback = function(value)
     local speed = tonumber(value) or 50
     local car = workspace.Vehicles:FindFirstChild(LocalPlayer.Name.."Car")
     if car and car.Body and car.Body:FindFirstChild("VehicleSeat") then
         car.Body.VehicleSeat.TopSpeed.Value = speed
     end
-end)
+end})
 
--- ============================================================
--- ABA 6: RGB
--- ============================================================
-local RGBTab = Window:NewTab("RGB")
-local RGBSpeedSection = RGBTab:NewSection("Velocidade RGB")
-local rgbSpeed = 3
-RGBSpeedSection:NewSlider("Velocidade", "Velocidade da mudança de cores", 1, 5, 3, function(v) rgbSpeed = v end)
+-- ========== TAB RGB ==========
+local RGBTab = Window:CreateTab("RGB", 5)
+local RGBSpeedSection = RGBTab:CreateSection("Velocidade RGB")
+RGBSpeedSection:CreateSlider({Name = "Velocidade", Range = {1, 5}, Increment = 1, CurrentValue = 3, Callback = function(v) rgbSpeed = v end})
 
-local function getRainbowColorRGB()
-    local h = (tick() * rgbSpeed % 5) / 5
-    return Color3.fromHSV(h, 1, 1)
-end
-
-local PlayerRGB = RGBTab:NewSection("RGB para você")
-PlayerRGB:NewToggle("Nome + Bio RGB", "Alterna cores do nome e bio", function(state)
+local PlayerRGB = RGBTab:CreateSection("RGB para você")
+PlayerRGB:CreateToggle({Name = "Nome + Bio RGB", CurrentValue = false, Callback = function(state)
+    nameBioActive = state
     task.spawn(function()
-        while state do
-            local color = getRainbowColorRGB()
+        while nameBioActive do
+            local color = getRainbowColor()
             fireServerRGB("1RPNam1eColo1r", "PickingRPNameColor", color)
             fireServerRGB("1RPNam1eColo1r", "PickingRPBioColor", color)
             task.wait(0.03)
         end
     end)
-end)
-PlayerRGB:NewToggle("RGB Corpo", "Alterna a cor do corpo", function(state)
+end})
+PlayerRGB:CreateToggle({Name = "RGB Corpo", CurrentValue = false, Callback = function(state)
+    corpoRGB = state
     task.spawn(function()
-        while state do
+        while corpoRGB do
             local remote = ReplicatedStorage:FindFirstChild("Remotes")
             if remote and remote:FindFirstChild("ChangeBodyColor") then
-                pcall(remote.ChangeBodyColor.FireServer, remote.ChangeBodyColor, {BrickColor.new(getRainbowColorRGB())})
+                pcall(remote.ChangeBodyColor.FireServer, remote.ChangeBodyColor, {BrickColor.new(getRainbowColor())})
             end
             task.wait(0.1)
         end
     end)
-end)
-PlayerRGB:NewToggle("RGB Cabelo", "Alterna a cor do cabelo", function(state)
+end})
+PlayerRGB:CreateToggle({Name = "RGB Cabelo", CurrentValue = false, Callback = function(state)
+    cabeloRGB = state
     task.spawn(function()
-        while state do
-            fireServerRGB("1Max1y", "ChangeHairColor2", getRainbowColorRGB())
+        while cabeloRGB do
+            fireServerRGB("1Max1y", "ChangeHairColor2", getRainbowColor())
             task.wait(0.5)
         end
     end)
-end)
+end})
 
-local VehicleRGB = RGBTab:NewSection("Veículos e Casa")
-VehicleRGB:NewToggle("RGB Casa", "Muda a cor da casa", function(state)
+local VehicleRGB = RGBTab:CreateSection("Veículos e Casa")
+VehicleRGB:CreateToggle({Name = "RGB Casa", CurrentValue = false, Callback = function(state)
+    casaRGB = state
     task.spawn(function()
-        while state do
-            fireServerRGB("1Player1sHous1e", "ColorPickHouse", getRainbowColorRGB())
+        while casaRGB do
+            fireServerRGB("1Player1sHous1e", "ColorPickHouse", getRainbowColor())
             task.wait(0.1)
         end
     end)
-end)
-VehicleRGB:NewToggle("Carro RGB", "Muda a cor do carro (Premium)", function(state)
+end})
+VehicleRGB:CreateToggle({Name = "Carro RGB (Premium)", CurrentValue = false, Callback = function(state)
+    carroRGB = state
     task.spawn(function()
-        while state do
-            fireServerRGB("1Player1sCa1r", "PickingCarColor", getRainbowColorRGB())
+        while carroRGB do
+            fireServerRGB("1Player1sCa1r", "PickingCarColor", getRainbowColor())
             task.wait(0.03)
         end
     end)
-end)
-VehicleRGB:NewToggle("RGB Bicicleta", "Muda a cor da bicicleta", function(state)
+end})
+VehicleRGB:CreateToggle({Name = "RGB Bicicleta", CurrentValue = false, Callback = function(state)
+    bikeRGB = state
     task.spawn(function()
-        while state do
-            fireServerRGB("1Player1sCa1r", "NoMotorColor", getRainbowColorRGB())
+        while bikeRGB do
+            fireServerRGB("1Player1sCa1r", "NoMotorColor", getRainbowColor())
             task.wait(0.1)
         end
     end)
-end)
+end})
 
-local ToolRGB = RGBTab:NewSection("Itens/Tool")
-ToolRGB:NewToggle("Rádio RGB", "Alterna a cor do rádio", function(state)
+local ToolRGB = RGBTab:CreateSection("Itens/Tool")
+ToolRGB:CreateToggle({Name = "Rádio RGB", CurrentValue = false, Callback = function(state)
+    radioRGB = state
     task.spawn(function()
-        while state do
-            local color = getRainbowColorRGB()
+        while radioRGB do
+            local color = getRainbowColor()
             local success, remote = pcall(function()
                 return LocalPlayer:WaitForChild("PlayerGui"):WaitForChild("ToolGui"):WaitForChild("ToolSettings"):WaitForChild("Settings"):WaitForChild("PropsColor"):WaitForChild("SetColor")
             end)
@@ -632,11 +633,12 @@ ToolRGB:NewToggle("Rádio RGB", "Alterna a cor do rádio", function(state)
             task.wait(0.03)
         end
     end)
-end)
-ToolRGB:NewToggle("RGB Megafone", "Alterna a cor do megafone", function(state)
+end})
+ToolRGB:CreateToggle({Name = "RGB Megafone", CurrentValue = false, Callback = function(state)
+    megafoneRGB = state
     task.spawn(function()
-        while state do
-            local color = getRainbowColorRGB()
+        while megafoneRGB do
+            local color = getRainbowColor()
             local gui = LocalPlayer:FindFirstChild("PlayerGui")
             if gui and gui:FindFirstChild("ToolGui") and gui.ToolGui:FindFirstChild("ToolSettings") and gui.ToolGui.ToolSettings:FindFirstChild("Settings") and gui.ToolGui.ToolSettings.Settings:FindFirstChild("PropsColor") and gui.ToolGui.ToolSettings.Settings.PropsColor:FindFirstChild("SetColor") then
                 pcall(gui.ToolGui.ToolSettings.Settings.PropsColor.SetColor.FireServer, gui.ToolGui.ToolSettings.Settings.PropsColor.SetColor, color)
@@ -644,17 +646,15 @@ ToolRGB:NewToggle("RGB Megafone", "Alterna a cor do megafone", function(state)
             task.wait(0.1)
         end
     end)
-end)
+end})
 
--- ============================================================
--- ABA 7: Music All
--- ============================================================
-local MusicAllTab = Window:NewTab("Music All")
-MusicAllTab:NewSection("Música Global")
-MusicAllTab:NewTextBox("ID da música manual", "Digite o ID e pressione Enter", function(value)
+-- ========== TAB MUSIC ALL ==========
+local MusicAllTab = Window:CreateTab("Music All", 6)
+local MusicAllSection = MusicAllTab:CreateSection("Música Global")
+MusicAllSection:CreateInput({Name = "ID da música manual", PlaceholderText = "Digite o ID", Callback = function(value)
     if value and value ~= "" then tocarMusica(tostring(value)) end
-end)
-MusicAllTab:NewToggle("Loop Música", "Repete a música atual", function(state)
+end})
+MusicAllSection:CreateToggle({Name = "Loop Música", CurrentValue = false, Callback = function(state)
     loopAllActive = state
     if state then
         task.spawn(function()
@@ -664,14 +664,13 @@ MusicAllTab:NewToggle("Loop Música", "Repete a música atual", function(state)
             end
         end)
     end
-end)
+end})
 
--- ============================================================
--- ABA 8: Troll Música (Dropdowns organizados)
--- ============================================================
-local TrollMusicaTab = Window:NewTab("Troll Música")
-local function createMusicDropdown(title, musicList)
-    local section = TrollMusicaTab:NewSection(title)
+-- ========== TAB TROLL MÚSICA (Dropdowns organizados) ==========
+local TrollMusicaTab = Window:CreateTab("Troll Música", 7)
+
+local function createMusicDropdown(sectionTitle, musicList)
+    local section = TrollMusicaTab:CreateSection(sectionTitle)
     local names = {}
     local idMap = {}
     for _, m in ipairs(musicList) do
@@ -680,14 +679,14 @@ local function createMusicDropdown(title, musicList)
             idMap[m.name] = m.id
         end
     end
-    local dropdown = section:NewDropdown("Selecione a música", names, function(selected)
+    section:CreateDropdown({Name = "Selecione a música", Options = names, CurrentOption = "", Callback = function(selected)
         if selected and idMap[selected] then
             tocarMusica(tostring(idMap[selected]))
         end
-    end)
+    end})
 end
 
--- Lista 1: 67 Hub Músicas (IDs fornecidos)
+-- Lista 1: 67 Hub Músicas (IDs fornecidos pelo usuário)
 local musicas67 = {
     {name = "Poze - Tropa do General", id = "76260463454427"},
     {name = "Aplico o Chá", id = "125706696726990"},
@@ -793,7 +792,7 @@ local funkList = {
 }
 createMusicDropdown("Funk", funkList)
 
--- Lista 5: Phonk (grande, coloco apenas uma amostra representativa)
+-- Lista 5: Phonk (amostra representativa)
 local phonkList = {
     {name = "wyles", id = "85385155970460"},
     {name = "phonk kawai", id = "91502410121438"},
@@ -834,12 +833,12 @@ corner.CornerRadius = UDim.new(1, 0)
 local uiVisible = true
 toggleButton.MouseButton1Click:Connect(function()
     uiVisible = not uiVisible
-    Window.Frame.Visible = uiVisible
+    Rayfield:Toggle()
     toggleButton.Text = uiVisible and "67" or "X"
 end)
 
 -- ============================================================
 -- NOTIFICAÇÃO FINAL
 -- ============================================================
-StarterGui:SetCore("SendNotification", {Title = "✅ 67 HUB", Text = "Carregado com sucesso! (Kavo UI)", Duration = 4})
-print("✅ 67 HUB - Kavo UI Edition carregado!")
+Rayfield:Notify({Title = "✅ 67 HUB", Content = "Carregado com sucesso! (Rayfield)", Duration = 4})
+print("✅ 67 HUB - Rayfield Edition carregado!")
