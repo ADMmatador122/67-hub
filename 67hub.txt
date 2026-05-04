@@ -1,10 +1,13 @@
 --[[
     ╔══════════════════════════════════════╗
-    ║    67 HUB - ONLY TABS & BUTTONS      ║
-    ║      by yuki/ADM_TROLLKKS (edit)     ║
+    ║    67 HUB - redzlib Edition          ║
+    ║      by yuki/ADM_TROLLKKS            ║
     ╚══════════════════════════════════════╝
 ]]
 
+-- ============================================================
+-- SERVIÇOS
+-- ============================================================
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
@@ -13,7 +16,9 @@ local LocalPlayer = Players.LocalPlayer
 
 workspace.FallenPartsDestroyHeight = -math.huge
 
+-- ============================================================
 -- VARIÁVEIS GLOBAIS
+-- ============================================================
 local selectedPlayerName = nil
 getgenv().Target = nil
 local Character = LocalPlayer.Character
@@ -27,25 +32,27 @@ LocalPlayer.CharacterAdded:Connect(function(newChar)
     RootPart = newChar:WaitForChild("HumanoidRootPart")
 end)
 
+-- ============================================================
 -- MÚSICAS
+-- ============================================================
 local musicas = {
-    {name = "Poze - Tropa do General", id = "76260463454427"},
-    {name = "Aplico o Chá", id = "125706696726990"},
-    {name = "Dom Dom Dom", id = "71010430843983"},
-    {name = "Amiguinhos que ta de Pt", id = "101427115159319"},
-    {name = "MC Poze - Saudades de vc irmão", id = "126572558378318"},
-    {name = "Quem n bafora n trnz", id = "105021704860122"},
-    {name = "Pros menor que vende drg", id = "90252250244704"},
-    {name = "Ritmada", id = "74867410898061"},
-    {name = "MC IG - 3 Dias", id = "110821596297428"},
-    {name = "Amiguinha Best", id = "138021904914351"},
-    {name = "Pena que acabou a gente", id = "105322893381167"},
-    {name = "Japa NK - Eu ja sei oq fazer", id = "94090546957206"},
-    {name = "Não para não baby", id = "132790002708106"},
-    {name = "Olha a explosão", id = "121075115415245"},
-    {name = "Eu vou cuspir", id = "133208997220334"},
-    {name = "Hylander - Comédia (vq x luck) 2020", id = "88307287482579"},
-    {name = "Baile do Antares (MotoG)", id = "100133382335077"}
+    {name = "Poze - Tropa do General",              id = "76260463454427"},
+    {name = "Aplico o Chá",                          id = "125706696726990"},
+    {name = "Dom Dom Dom",                           id = "71010430843983"},
+    {name = "Amiguinhos que ta de Pt",               id = "101427115159319"},
+    {name = "MC Poze - Saudades de vc irmão",        id = "126572558378318"},
+    {name = "Quem n bafora n trnz",                  id = "105021704860122"},
+    {name = "Pros menor que vende drg",              id = "90252250244704"},
+    {name = "Ritmada",                               id = "74867410898061"},
+    {name = "MC IG - 3 Dias",                        id = "110821596297428"},
+    {name = "Amiguinha Best",                        id = "138021904914351"},
+    {name = "Pena que acabou a gente",               id = "105322893381167"},
+    {name = "Japa NK - Eu ja sei oq fazer",          id = "94090546957206"},
+    {name = "Não para não baby",                     id = "132790002708106"},
+    {name = "Olha a explosão",                       id = "121075115415245"},
+    {name = "Eu vou cuspir",                         id = "133208997220334"},
+    {name = "Hylander - Comédia (vq x luck) 2020",   id = "88307287482579"},
+    {name = "Baile do Antares (MotoG)",              id = "100133382335077"}
 }
 
 local function tocarMusica(id)
@@ -55,7 +62,9 @@ local function tocarMusica(id)
     pcall(function() ReplicatedStorage:WaitForChild("RE"):WaitForChild("1NoMoto1rVehicle1s"):FireServer("PickingScooterMusicText", id) end)
 end
 
--- FUNÇÕES AUXILIARES (couch kill, bus kill, etc.)
+-- ============================================================
+-- FUNÇÕES AUXILIARES (KILLS, FLINGS, ETC.)
+-- ============================================================
 local function KillPlayerCouch(targetName)
     local target = Players:FindFirstChild(targetName)
     if not target or not target.Character then return end
@@ -159,50 +168,50 @@ local function KillWithBus(targetName)
     ReplicatedStorage:WaitForChild("RE"):WaitForChild("1Ca1r"):FireServer("DeleteAllVehicles")
 end
 
--- FLUENT UI
-local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
-local Window = Fluent:CreateWindow({
-    Title = "67 Hub (Only Tabs & Buttons)",
-    SubTitle = "by yuki/ADM_TROLLKKS",
-    TabWidth = 160,
-    Size = UDim2.fromOffset(600, 480),
-    Acrylic = true,
-    Theme = "Dark",
-    MinimizeKey = Enum.KeyCode.RightControl
+-- ============================================================
+-- INICIAR REDZLIB UI
+-- ============================================================
+local redzlib = loadstring(game:HttpGet("https://raw.githubusercontent.com/REDzHUB/RedzLibV5/main/Source.Lua"))()
+
+local Window = redzlib:MakeWindow({
+    Title = "67 HUB",
+    SubTitle = "by yuki/ADM_TROLLKKS | redzlib Edition",
+    SaveFolder = "67Hub_Config"
 })
 
 -- ======================== ABA: INFO ========================
-local InfoTab = Window:AddTab({ Title = "Info", Icon = "info" })
-InfoTab:AddParagraph({ Title = "67 Hub", Content = "Versão apenas com abas e botões.\nTodas as ações são executadas por botões." })
-InfoTab:AddButton({ Title = "Rejoin", Description = "Reconectar ao mesmo servidor", Callback = function()
+local InfoTab = Window:MakeTab({"Info", "info"})
+InfoTab:AddParagraph({"67 HUB", "Versão completa com redzlib\nTodas as funcionalidades originais"})
+InfoTab:AddButton({"Rejoin", function()
     game:GetService("TeleportService"):TeleportToPlaceInstance(game.PlaceId, game.JobId, LocalPlayer)
-end })
+end})
 
 -- ======================== ABA: MÚSICAS ========================
-local MusicTab = Window:AddTab({ Title = "Músicas", Icon = "music" })
-MusicTab:AddParagraph({ Title = "🎶 Músicas disponíveis", Content = "Clique para tocar" })
+local MusicTab = Window:MakeTab({"Músicas", "music"})
+MusicTab:AddParagraph({"🎵 17 Músicas", "Clique para tocar"})
 for _, musica in ipairs(musicas) do
-    MusicTab:AddButton({ Title = musica.name, Description = "ID: " .. musica.id, Callback = function()
+    MusicTab:AddButton({musica.name, function()
         pcall(tocarMusica, musica.id)
-        Fluent:Notify({ Title = "🎵 Tocando", Content = musica.name, Duration = 3 })
-    end })
+        redzlib:Notification({Title = "🎵 Tocando", Text = musica.name, Duration = 3})
+    end})
 end
 
--- ======================== ABA: CONTROLES ========================
-local CtrlTab = Window:AddTab({ Title = "Controles", Icon = "settings" })
-CtrlTab:AddButton({ Title = "⏹️ Parar Música", Callback = function()
+-- ======================== ABA: CONTROLES MÚSICA ========================
+local CtrlTab = Window:MakeTab({"Controles", "settings"})
+CtrlTab:AddButton({"⏹️ Parar Música", function()
     pcall(function() ReplicatedStorage:WaitForChild("RE"):WaitForChild("PlayerToolEvent"):FireServer("ToolMusicText", "") end)
     pcall(function() ReplicatedStorage:WaitForChild("RE"):WaitForChild("1Player1sHous1e"):FireServer("PickHouseMusicText", "") end)
     pcall(function() ReplicatedStorage:WaitForChild("RE"):WaitForChild("1Player1sCa1r"):FireServer("PickingCarMusicText", "") end)
     pcall(function() ReplicatedStorage:WaitForChild("RE"):WaitForChild("1NoMoto1rVehicle1s"):FireServer("PickingScooterMusicText", "") end)
-    Fluent:Notify({ Title = "⏹️ Música parada", Duration = 2 })
-end })
+    redzlib:Notification({Title = "⏹️ Parado", Text = "Música parada!", Duration = 2})
+end})
 
 -- ======================== ABA: TROLL GERAL ========================
-local TrollTab = Window:AddTab({ Title = "Troll", Icon = "zap" })
-TrollTab:AddParagraph({ Title = "Scripts Troll", Content = "Botões para trolar todo o servidor" })
+local TrollTab = Window:MakeTab({"Troll", "zap"})
+TrollTab:AddParagraph({"Scripts Troll", "Ferramentas de troll no servidor"})
 
-TrollTab:AddButton({ Title = "Black Hole", Description = "Puxa todas as partes para você", Callback = function()
+-- Black Hole
+TrollTab:AddButton({"Black Hole", function()
     local RunServiceBH = game:GetService("RunService")
     local WorkspaceBH = game:GetService("Workspace")
     local angle = 1
@@ -260,10 +269,11 @@ TrollTab:AddButton({ Title = "Black Hole", Description = "Puxa todas as partes p
             Attachment1.WorldCFrame = humanoidRootPart.CFrame * CFrame.new(math.cos(angle)*radius, 0, math.sin(angle)*radius)
         end
     end)
-    Fluent:Notify({ Title = "🌀 Black Hole", Content = "Ativado!", Duration = 2 })
-end })
+    redzlib:Notification({Title = "🌀 Black Hole", Text = "Ativado!", Duration = 2})
+end})
 
-TrollTab:AddButton({ Title = "Fling Boat All", Description = "Usa barco para lançar todos", Callback = function()
+-- Fling Boat All
+TrollTab:AddButton({"Fling Boat All", function()
     local Player = game.Players.LocalPlayer
     local Char = Player.Character
     local Hum = Char and Char:FindFirstChildOfClass("Humanoid")
@@ -320,10 +330,11 @@ TrollTab:AddButton({ Title = "Fling Boat All", Description = "Usa barco para lan
     task.wait(0.5)
     Root.CFrame = OldPos
     SpinGyro:Destroy()
-    Fluent:Notify({ Title = "✅ Fling Boat", Content = "Concluído!", Duration = 3 })
-end })
+    redzlib:Notification({Title = "✅ Fling Boat", Text = "Concluído!", Duration = 3})
+end})
 
-TrollTab:AddButton({ Title = "Bring All Couch", Description = "Dupa sofás para puxar todos", Callback = function()
+-- Bring All Couch
+TrollTab:AddButton({"Bring All Couch", function()
     local args = { [1] = "ClearAllTools" }
     game:GetService("ReplicatedStorage"):WaitForChild("RE"):WaitForChild("1Clea1rTool1s"):FireServer(unpack(args))
     wait(0.2)
@@ -369,10 +380,11 @@ TrollTab:AddButton({ Title = "Bring All Couch", Description = "Dupa sofás para 
     repeat wait() until game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
     game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = oldcf
     duping = false
-    Fluent:Notify({ Title = "✅ Bring All Couch", Content = "Dupação concluída!", Duration = 3 })
-end })
+    redzlib:Notification({Title = "✅ Bring All Couch", Text = "Dupação concluída!", Duration = 3})
+end})
 
-TrollTab:AddButton({ Title = "Auto Fling All", Description = "Lança todos os jogadores", Callback = function()
+-- Auto Fling All
+TrollTab:AddButton({"Auto Fling All", function()
     local LP = game.Players.LocalPlayer
     local function ProcessPlayer(target)
         if not target or not target.Character or target == LP then return end
@@ -427,9 +439,10 @@ TrollTab:AddButton({ Title = "Auto Fling All", Description = "Lança todos os jo
     for _, player in ipairs(Players:GetPlayers()) do
         ProcessPlayer(player)
     end
-end })
+end})
 
-TrollTab:AddButton({ Title = "Shutdown Servidor", Description = "Tenta crashar o servidor", Callback = function()
+-- Shutdown Servidor
+TrollTab:AddButton({"Shutdown Servidor", function()
     for m = 1, 635 do
         pcall(function() game:GetService("ReplicatedStorage").RE:FindFirstChild("1Too1l"):InvokeServer("PickingTools", "FireHose") end)
         pcall(function()
@@ -437,261 +450,204 @@ TrollTab:AddButton({ Title = "Shutdown Servidor", Description = "Tenta crashar o
             game:GetService("Players").LocalPlayer.Backpack.FireHose.ToolSound:FireServer(unpack(args2))
         end)
     end
-    Fluent:Notify({ Title = "💥 Shutdown", Content = "Script enviado!", Duration = 3 })
-end })
+    redzlib:Notification({Title = "💥 Shutdown", Text = "Script enviado!", Duration = 3})
+end})
 
--- Botões para ativar/desativar Lags (start/stop)
+-- Toggle: Lag com Bomba
 local lagBombActive = false
-local bombCoroutine = nil
-TrollTab:AddButton({ Title = "Iniciar Lag com Bomba", Callback = function()
-    if bombCoroutine then return end
-    lagBombActive = true
-    bombCoroutine = task.spawn(function()
-        local P = game.Players.LocalPlayer
-        while lagBombActive do
-            local Char2 = P.Character
-            local Root2 = Char2 and Char2:FindFirstChild("HumanoidRootPart")
-            local Bomb = workspace:FindFirstChild("WorkspaceCom") and workspace.WorkspaceCom:FindFirstChild("001_CriminalWeapons") and workspace.WorkspaceCom["001_CriminalWeapons"]:FindFirstChild("GiveTools") and workspace.WorkspaceCom["001_CriminalWeapons"].GiveTools:FindFirstChild("Bomb")
-            if Bomb and Root2 then
-                Root2.CFrame = Bomb.CFrame
-                pcall(function() fireclickdetector(Bomb.ClickDetector) end)
-                task.wait(0.00001)
-            else task.wait(0.1) end
-        end
-    end)
-    task.spawn(function()
-        while lagBombActive do
-            local Bomb = workspace:FindFirstChild("WorkspaceCom") and workspace.WorkspaceCom:FindFirstChild("001_CriminalWeapons") and workspace.WorkspaceCom["001_CriminalWeapons"]:FindFirstChild("GiveTools") and workspace.WorkspaceCom["001_CriminalWeapons"].GiveTools:FindFirstChild("Bomb")
-            if Bomb then
-                VirtualInputManager:SendMouseButtonEvent(500, 500, 0, true, game, 0)
+TrollTab:AddToggle({"Lag com Bomba", "Spam de bomba para causar lag", function(state)
+    lagBombActive = state
+    if state then
+        task.spawn(function()
+            local P = game.Players.LocalPlayer
+            while lagBombActive do
+                local Char2 = P.Character
+                local Root2 = Char2 and Char2:FindFirstChild("HumanoidRootPart")
+                local Bomb = workspace:FindFirstChild("WorkspaceCom") and workspace.WorkspaceCom:FindFirstChild("001_CriminalWeapons") and workspace.WorkspaceCom["001_CriminalWeapons"]:FindFirstChild("GiveTools") and workspace.WorkspaceCom["001_CriminalWeapons"].GiveTools:FindFirstChild("Bomb")
+                if Bomb and Root2 then
+                    Root2.CFrame = Bomb.CFrame
+                    pcall(function() fireclickdetector(Bomb.ClickDetector) end)
+                    task.wait(0.00001)
+                else task.wait(0.1) end
+            end
+        end)
+        task.spawn(function()
+            while lagBombActive do
+                local Bomb = workspace:FindFirstChild("WorkspaceCom") and workspace.WorkspaceCom:FindFirstChild("001_CriminalWeapons") and workspace.WorkspaceCom["001_CriminalWeapons"]:FindFirstChild("GiveTools") and workspace.WorkspaceCom["001_CriminalWeapons"].GiveTools:FindFirstChild("Bomb")
+                if Bomb then
+                    VirtualInputManager:SendMouseButtonEvent(500, 500, 0, true, game, 0)
+                    task.wait(1.5)
+                    VirtualInputManager:SendMouseButtonEvent(500, 500, 0, false, game, 0)
+                    pcall(function() ReplicatedStorage:WaitForChild("RE"):WaitForChild("1Blo1wBomb1sServe1r"):FireServer("Bomb" .. P.Name) end)
+                end
                 task.wait(1.5)
-                VirtualInputManager:SendMouseButtonEvent(500, 500, 0, false, game, 0)
-                pcall(function() ReplicatedStorage:WaitForChild("RE"):WaitForChild("1Blo1wBomb1sServe1r"):FireServer("Bomb" .. P.Name) end)
             end
-            task.wait(1.5)
-        end
-    end)
-    Fluent:Notify({ Title = "💣 Lag com Bomba", Content = "Ativado! Pressione 'Parar Lag' para desativar.", Duration = 3 })
-end })
-TrollTab:AddButton({ Title = "Parar Lag com Bomba", Callback = function()
-    lagBombActive = false
-    if bombCoroutine then task.cancel(bombCoroutine) bombCoroutine = nil end
-    Fluent:Notify({ Title = "✅ Lag Bomba", Content = "Parado.", Duration = 2 })
-end })
-
-local lagLaptopActive = false
-local laptopCoroutine = nil
-TrollTab:AddButton({ Title = "Iniciar Lag com Laptop", Callback = function()
-    if laptopCoroutine then return end
-    lagLaptopActive = true
-    laptopCoroutine = task.spawn(function()
-        while lagLaptopActive do
-            local laptop = workspace:FindFirstChild("WorkspaceCom") and workspace.WorkspaceCom:FindFirstChild("001_GiveTools") and workspace.WorkspaceCom["001_GiveTools"]:FindFirstChild("Laptop")
-            if laptop then
-                game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = laptop.CFrame
-                local cd = laptop:FindFirstChildWhichIsA("ClickDetector")
-                if cd then pcall(function() fireclickdetector(cd) end) end
-            end
-            task.wait(0.0001)
-        end
-    end)
-    Fluent:Notify({ Title = "💻 Lag Laptop", Content = "Ativado!", Duration = 2 })
-end })
-TrollTab:AddButton({ Title = "Parar Lag com Laptop", Callback = function()
-    lagLaptopActive = false
-    if laptopCoroutine then task.cancel(laptopCoroutine) laptopCoroutine = nil end
-    Fluent:Notify({ Title = "✅ Lag Laptop", Content = "Parado.", Duration = 2 })
-end })
-
-local lagPhoneActive = false
-local phoneCoroutine = nil
-TrollTab:AddButton({ Title = "Iniciar Lag com Telefone", Callback = function()
-    if phoneCoroutine then return end
-    lagPhoneActive = true
-    phoneCoroutine = task.spawn(function()
-        while lagPhoneActive do
-            local phonePath = workspace:FindFirstChild("WorkspaceCom") and
-                workspace.WorkspaceCom:FindFirstChild("001_CommercialStores") and
-                workspace.WorkspaceCom["001_CommercialStores"]:FindFirstChild("CommercialStorage1")
-            local phone = phonePath and phonePath:FindFirstChild("Store") and phonePath.Store:FindFirstChild("Tools") and phonePath.Store.Tools:FindFirstChild("Iphone")
-            if phone then
-                game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = phone.CFrame
-                local cd = phone:FindFirstChildWhichIsA("ClickDetector")
-                if cd then pcall(function() fireclickdetector(cd) end) end
-            end
-            task.wait(0.01)
-        end
-    end)
-    Fluent:Notify({ Title = "📱 Lag Telefone", Content = "Ativado!", Duration = 2 })
-end })
-TrollTab:AddButton({ Title = "Parar Lag com Telefone", Callback = function()
-    lagPhoneActive = false
-    if phoneCoroutine then task.cancel(phoneCoroutine) phoneCoroutine = nil end
-    Fluent:Notify({ Title = "✅ Lag Telefone", Content = "Parado.", Duration = 2 })
-end })
-
--- ======================== ABA: TROLL PLAYERS (seleção por botões) ========================
-local TrollPlayersTab = Window:AddTab({ Title = "Troll Players", Icon = "user" })
-TrollPlayersTab:AddParagraph({ Title = "Seleção de Alvo", Content = "Clique no nome do jogador abaixo para selecionar. Depois use os botões de ataque." })
-
--- Atualizar lista de jogadores
-local playerButtons = {}
-local function refreshPlayerList()
-    for _, btn in pairs(playerButtons) do
-        if btn and btn.Destroy then btn:Destroy() end
+        end)
+        redzlib:Notification({Title = "💣 Lag com Bomba", Text = "Ativado!", Duration = 2})
+    else
+        redzlib:Notification({Title = "✅ Lag Bomba", Text = "Desativado", Duration = 2})
     end
-    playerButtons = {}
-    local playersList = {}
+end})
+
+-- Toggle: Lag com Laptop
+local lagLaptopActive = false
+TrollTab:AddToggle({"Lag com Laptop", "Spam no laptop", function(state)
+    lagLaptopActive = state
+    if state then
+        task.spawn(function()
+            while lagLaptopActive do
+                local laptop = workspace:FindFirstChild("WorkspaceCom") and workspace.WorkspaceCom:FindFirstChild("001_GiveTools") and workspace.WorkspaceCom["001_GiveTools"]:FindFirstChild("Laptop")
+                if laptop then
+                    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = laptop.CFrame
+                    local cd = laptop:FindFirstChildWhichIsA("ClickDetector")
+                    if cd then pcall(function() fireclickdetector(cd) end) end
+                end
+                task.wait(0.0001)
+            end
+        end)
+        redzlib:Notification({Title = "💻 Lag Laptop", Text = "Ativado!", Duration = 2})
+    else
+        redzlib:Notification({Title = "✅ Lag Laptop", Text = "Desativado", Duration = 2})
+    end
+end})
+
+-- Toggle: Lag com Telefone
+local lagPhoneActive = false
+TrollTab:AddToggle({"Lag com Telefone", "Spam no iPhone", function(state)
+    lagPhoneActive = state
+    if state then
+        task.spawn(function()
+            while lagPhoneActive do
+                local phonePath = workspace:FindFirstChild("WorkspaceCom") and workspace.WorkspaceCom:FindFirstChild("001_CommercialStores") and workspace.WorkspaceCom["001_CommercialStores"]:FindFirstChild("CommercialStorage1")
+                local phone = phonePath and phonePath:FindFirstChild("Store") and phonePath.Store:FindFirstChild("Tools") and phonePath.Store.Tools:FindFirstChild("Iphone")
+                if phone then
+                    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = phone.CFrame
+                    local cd = phone:FindFirstChildWhichIsA("ClickDetector")
+                    if cd then pcall(function() fireclickdetector(cd) end) end
+                end
+                task.wait(0.01)
+            end
+        end)
+        redzlib:Notification({Title = "📱 Lag Telefone", Text = "Ativado!", Duration = 2})
+    else
+        redzlib:Notification({Title = "✅ Lag Telefone", Text = "Desativado", Duration = 2})
+    end
+end})
+
+-- ======================== ABA: TROLL PLAYERS ========================
+local TrollPlayersTab = Window:MakeTab({"Troll Players", "user"})
+TrollPlayersTab:AddParagraph({"Seleção de Alvo", "Escolha um jogador abaixo e use os botões"})
+
+-- Dropdown dinâmico para selecionar jogador
+local playerList = {}
+local function updatePlayerDropdown()
+    local newList = {}
     for _, p in ipairs(Players:GetPlayers()) do
         if p ~= LocalPlayer then
-            table.insert(playersList, p.Name)
+            table.insert(newList, p.Name)
         end
     end
-    if #playersList == 0 then
-        local emptyBtn = TrollPlayersTab:AddButton({ Title = "Nenhum outro jogador", Callback = function() end })
-        table.insert(playerButtons, emptyBtn)
-    else
-        for _, name in ipairs(playersList) do
-            local btn = TrollPlayersTab:AddButton({ Title = "🎯 " .. name, Callback = function()
-                selectedPlayerName = name
-                getgenv().Target = name
-                Fluent:Notify({ Title = "✅ Alvo selecionado", Content = name, Duration = 2 })
-            end })
-            table.insert(playerButtons, btn)
-        end
-    end
+    if #newList == 0 then table.insert(newList, "Nenhum") end
+    playerDropdown:Set(newList)
 end
 
-refreshPlayerList()
-TrollPlayersTab:AddButton({ Title = "Atualizar Lista", Callback = refreshPlayerList })
+local playerDropdown = TrollPlayersTab:AddDropdown({"Selecionar Jogador", "Clique para escolher", {"Carregando..."}, function(value)
+    selectedPlayerName = value
+    getgenv().Target = value
+    redzlib:Notification({Title = "Alvo", Text = selectedPlayerName, Duration = 2})
+end})
+updatePlayerDropdown()
 
--- Botões de ataque (usam o selectedPlayerName)
-TrollPlayersTab:AddButton({ Title = "Teleportar até o Player", Callback = function()
-    if not selectedPlayerName then Fluent:Notify({ Title = "❌ Nenhum alvo", Duration = 2 }) return end
+TrollPlayersTab:AddButton({"Atualizar Lista de Jogadores", updatePlayerDropdown})
+
+-- Botões de ataque
+TrollPlayersTab:AddButton({"Teleportar até o Player", function()
+    if not selectedPlayerName then redzlib:Notification({Title="Erro", Text="Selecione um jogador", Duration=2}) return end
     local target = Players:FindFirstChild(selectedPlayerName)
     local root = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
     if target and target.Character and target.Character:FindFirstChild("HumanoidRootPart") and root then
-        root.CFRame = target.Character.HumanoidRootPart.CFrame
+        root.CFrame = target.Character.HumanoidRootPart.CFrame
     end
-end })
+end})
 
-TrollPlayersTab:AddButton({ Title = "Matar com Couch (completo)", Callback = function()
-    if not selectedPlayerName then Fluent:Notify({ Title = "❌ Nenhum alvo", Duration = 2 }) return end
-    KillPlayerCouch(selectedPlayerName)
-end })
+-- Dropdown para método de kill
+local killMethod = "Couch"
+local methodDropdown = TrollPlayersTab:AddDropdown({"Método de Matar", "Escolha o método", {"Couch", "Ônibus"}, function(value)
+    killMethod = value
+end})
 
-TrollPlayersTab:AddButton({ Title = "Matar com Ônibus", Callback = function()
-    if not selectedPlayerName then Fluent:Notify({ Title = "❌ Nenhum alvo", Duration = 2 }) return end
-    KillWithBus(selectedPlayerName)
-end })
-
-TrollPlayersTab:AddButton({ Title = "Click Kill Couch (Touch)", Description = "Equipa tool de kill por toque", Callback = function()
-    local jogadores = game:GetService("Players")
-    local rep = game:GetService("ReplicatedStorage")
-    local loop = game:GetService("RunService")
-    local mundo = game:GetService("Workspace")
-    local entrada = game:GetService("UserInputService")
-    local eu = jogadores.LocalPlayer
-    local camCK = mundo.CurrentCamera
-    local NOME_FERRAMENTA = "Click Kill Couch"
-    local ferramentaEquipada = false
-    local nomeAlvo = nil
-    local loopTP = nil
-    local sofaEquipado = false
-    local base = nil
-    local posInicial = nil
-    local raizCK = nil
-    local mochila = eu:WaitForChild("Backpack")
-    if not mochila:FindFirstChild(NOME_FERRAMENTA) then
-        local ferramenta = Instance.new("Tool")
-        ferramenta.Name = NOME_FERRAMENTA
-        ferramenta.RequiresHandle = false
-        ferramenta.CanBeDropped = false
-        ferramenta.Equipped:Connect(function() ferramentaEquipada = true end)
-        ferramenta.Unequipped:Connect(function()
-            ferramentaEquipada = false
-            nomeAlvo = nil
-            if loopTP then loopTP:Disconnect() loopTP = nil end
-            if sofaEquipado then
-                local boneco = eu.Character
-                if boneco then
-                    local sofa = boneco:FindFirstChild("Couch")
-                    if sofa then sofa.Parent = eu.Backpack sofaEquipado = false end
-                end
-            end
-            if base then base:Destroy() base = nil end
-        end)
-        ferramenta.Parent = mochila
+TrollPlayersTab:AddButton({"Matar Player", function()
+    if not selectedPlayerName then redzlib:Notification({Title="Erro", Text="Selecione um jogador", Duration=2}) return end
+    if killMethod == "Couch" then
+        KillPlayerCouch(selectedPlayerName)
+    elseif killMethod == "Ônibus" then
+        KillWithBus(selectedPlayerName)
     end
-    local function arremessarComSofa(alvo)
-        if not alvo then return end
-        nomeAlvo = alvo.Name
-        local boneco = eu.Character
-        if not boneco then return end
-        posInicial = boneco:FindFirstChild("HumanoidRootPart") and boneco.HumanoidRootPart.CFrame
-        raizCK = boneco:FindFirstChild("HumanoidRootPart")
-        if not mochila:FindFirstChild("Couch") and not boneco:FindFirstChild("Couch") then
-            rep.RE["1Too1l"]:InvokeServer("PickingTools", "Couch")
-            task.wait(0.1)
-        end
-        local sofa = mochila:FindFirstChild("Couch") or boneco:FindFirstChild("Couch")
-        if sofa then sofa.Parent = boneco sofaEquipado = true end
-        loopTP = loop.Heartbeat:Connect(function()
-            local alvoAtual = jogadores:FindFirstChild(nomeAlvo)
-            if not alvoAtual or not alvoAtual.Character or not alvoAtual.Character:FindFirstChild("Humanoid") then
-                if loopTP then loopTP:Disconnect() loopTP = nil end return
-            end
-            local minhaRaiz = eu.Character and eu.Character:FindFirstChild("HumanoidRootPart")
-            local humano = eu.Character and eu.Character:FindFirstChildOfClass("Humanoid")
-            if not minhaRaiz or not humano then return end
-            humano:SetStateEnabled(Enum.HumanoidStateType.Physics, false)
-            if not base then
-                base = Instance.new("Part")
-                base.Size = Vector3.new(10,1,10)
-                base.Anchored = true
-                base.CanCollide = true
-                base.Transparency = 0.5
-                base.Parent = mundo
-            end
-            local rp = alvoAtual.Character.HumanoidRootPart
-            local destino = rp.Position + Vector3.new(math.random(-2,2), -5.1, math.random(-2,2))
-            base.Position = destino
-            minhaRaiz.CFrame = CFrame.new(destino)
-            humano:SetStateEnabled(Enum.HumanoidStateType.Physics, true)
-        end)
+end})
+
+-- Toggle: Auto Fling (contínuo no alvo)
+local flingActive = false
+TrollPlayersTab:AddToggle({"Auto Fling (contínuo)", "Lança o jogador selecionado repetidamente", function(state)
+    flingActive = state
+    if state and selectedPlayerName then
+        local target = Players:FindFirstChild(selectedPlayerName)
+        if not target or not target.Character then return end
+        local root = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+        local tRoot = target.Character and target.Character:FindFirstChild("HumanoidRootPart")
+        if not root or not tRoot then return end
+        local char = LocalPlayer.Character
+        local hum = char:FindFirstChildOfClass("Humanoid")
+        local original = root.CFrame
+        ReplicatedStorage:WaitForChild("RE"):WaitForChild("1Clea1rTool1s"):FireServer("ClearAllTools")
+        task.wait(0.2)
+        ReplicatedStorage.RE:FindFirstChild("1Too1l"):InvokeServer("PickingTools", "Couch")
+        task.wait(0.3)
+        local tool = LocalPlayer.Backpack:FindFirstChild("Couch")
+        if tool then tool.Parent = char end
+        task.wait(0.2)
+        game:GetService("VirtualInputManager"):SendKeyEvent(true, Enum.KeyCode.F, false, game)
+        task.wait(0.25)
+        workspace.FallenPartsDestroyHeight = 0/0
+        local bv = Instance.new("BodyVelocity")
+        bv.Velocity = Vector3.new(9e8,9e8,9e8)
+        bv.MaxForce = Vector3.new(1/0,1/0,1/0)
+        bv.Parent = root
+        hum:SetStateEnabled(Enum.HumanoidStateType.Seated, false)
+        hum.PlatformStand = false
+        cam.CameraSubject = target.Character:FindFirstChild("Head") or tRoot or hum
         task.spawn(function()
-            local alvoAtual = jogadores:FindFirstChild(nomeAlvo)
-            while alvoAtual and alvoAtual.Character and alvoAtual.Character:FindFirstChild("Humanoid") do
-                task.wait(0.05)
-                if alvoAtual.Character.Humanoid.SeatPart then
-                    local buraco = CFrame.new(265.46, -450.83, -59.93)
-                    alvoAtual.Character.HumanoidRootPart.CFrame = buraco
-                    eu.Character.HumanoidRootPart.CFrame = buraco
-                    task.wait(0.4)
-                    if loopTP then loopTP:Disconnect() loopTP = nil end
-                    task.wait(0.2)
-                    if posInicial then eu.Character.HumanoidRootPart.CFrame = posInicial end
-                    break
-                end
+            local angle = 0
+            while flingActive and target and target.Character and target.Character:FindFirstChildOfClass("Humanoid") do
+                local tHum = target.Character:FindFirstChildOfClass("Humanoid")
+                if tHum.Sit then break end
+                angle += 50
+                local hrp = target.Character.HumanoidRootPart
+                local pos_x = hrp.Position.X + (hrp.Velocity.X / 1.5)
+                local pos_y = hrp.Position.Y + (hrp.Velocity.Y / 1.5)
+                local pos_z = hrp.Position.Z + (hrp.Velocity.Z / 1.5)
+                root.CFrame = CFrame.new(pos_x, pos_y, pos_z) * CFrame.Angles(math.rad(angle), 0, 0)
+                root.Velocity = Vector3.new(9e8, 9e8, 9e8)
+                root.RotVelocity = Vector3.new(9e8, 9e8, 9e8)
+                task.wait()
             end
+            flingActive = false
+            bv:Destroy()
+            hum:SetStateEnabled(Enum.HumanoidStateType.Seated, true)
+            hum.PlatformStand = false
+            root.CFrame = original
+            cam.CameraSubject = hum
+            for _, p in pairs(char:GetDescendants()) do
+                if p:IsA("BasePart") then p.Velocity = Vector3.zero p.RotVelocity = Vector3.zero end
+            end
+            hum:UnequipTools()
+            ReplicatedStorage.RE:FindFirstChild("1Too1l"):InvokeServer("PickingTools", "Couch")
         end)
     end
-    entrada.TouchTap:Connect(function(toques, processado)
-        if not ferramentaEquipada or processado then return end
-        local pos = toques[1]
-        local raio = camCK:ScreenPointToRay(pos.X, pos.Y)
-        local hit = mundo:Raycast(raio.Origin, raio.Direction * 1000)
-        if hit and hit.Instance then
-            local modelo = hit.Instance:FindFirstAncestorOfClass("Model")
-            local jogador = jogadores:GetPlayerFromCharacter(modelo)
-            if jogador and jogador ~= eu then arremessarComSofa(jogador) end
-        end
-    end)
-    Fluent:Notify({ Title = "✅ Click Kill Couch", Content = "Ferramenta equipada! Toque em um jogador.", Duration = 3 })
-end })
+end})
 
-TrollPlayersTab:AddButton({ Title = "Fling Ball (no alvo)", Callback = function()
-    if not selectedPlayerName then Fluent:Notify({ Title = "❌ Nenhum alvo", Duration = 2 }) return end
+-- Fling Ball (usa bola de futebol)
+TrollPlayersTab:AddButton({"Fling Ball (alvo)", function()
+    if not selectedPlayerName then redzlib:Notification({Title="Erro", Text="Selecione um jogador", Duration=2}) return end
     local players = game:GetService("Players")
     local player = players.LocalPlayer
     local character = player.Character or player.CharacterAdded:Wait()
@@ -737,10 +693,11 @@ TrollPlayersTab:AddButton({ Title = "Fling Ball (no alvo)", Callback = function(
         until troot.Velocity.Magnitude > 1000 or thum.Health <= 0
         workspace.CurrentCamera.CameraSubject = humanoid
     end
-end })
+end})
 
-TrollPlayersTab:AddButton({ Title = "House Ban Kill", Callback = function()
-    if not selectedPlayerName then Fluent:Notify({ Title = "❌ Nenhum alvo", Duration = 2 }) return end
+-- House Ban Kill
+TrollPlayersTab:AddButton({"House Ban Kill", function()
+    if not selectedPlayerName then redzlib:Notification({Title="Erro", Text="Selecione um jogador", Duration=2}) return end
     local selectedPlayer = Players:FindFirstChild(selectedPlayerName)
     if not selectedPlayer then return end
     local Player = LocalPlayer
@@ -837,140 +794,134 @@ TrollPlayersTab:AddButton({ Title = "House Ban Kill", Callback = function()
             end
         end
     end
-    Fluent:Notify({ Title = "✅ House Ban Kill", Content = "Concluído!", Duration = 3 })
-end })
+    redzlib:Notification({Title = "✅ House Ban Kill", Text = "Concluído!", Duration = 3})
+end})
 
 -- ======================== ABA: CARROS ========================
-local CarTab = Window:AddTab({ Title = "Carros", Icon = "truck" })
-CarTab:AddButton({ Title = "Remove All Cars", Callback = function()
+local CarTab = Window:MakeTab({"Carros", "truck"})
+CarTab:AddButton({"Remove All Cars", function()
     ReplicatedStorage:WaitForChild("RE"):WaitForChild("1Ca1r"):FireServer("DeleteAllVehicles")
-    Fluent:Notify({ Title = "✅ Carros removidos", Duration = 2 })
-end })
-CarTab:AddButton({ Title = "Bring All Cars", Callback = function()
+    redzlib:Notification({Title = "✅ Carros", Text = "Todos os veículos removidos!", Duration = 2})
+end})
+CarTab:AddButton({"Bring All Cars", function()
     for _, v in next, workspace.Vehicles:GetChildren() do
         v:SetPrimaryPartCFrame(game.Players.LocalPlayer.Character:GetPrimaryPartCFrame())
     end
-    Fluent:Notify({ Title = "✅ Carros puxados", Duration = 2 })
-end })
+    redzlib:Notification({Title = "✅ Carros", Text = "Todos os carros puxados!", Duration = 2})
+end})
 
+-- Toggle: Spam Cars
 local spamCarsActive = false
-local spamCoroutine = nil
-local carList = {"SchoolBus","SmartCar","FarmTruck","Cadillac","Excavator","Jeep","NascarTruck","TowTruck","Snowplow","MilitaryTruck","Tank","Limo","FireTruck"}
-CarTab:AddButton({ Title = "Iniciar Spam Cars", Callback = function()
-    if spamCoroutine then return end
-    spamCarsActive = true
-    spamCoroutine = task.spawn(function()
-        while spamCarsActive do
-            for _, carName in ipairs(carList) do
-                if not spamCarsActive then break end
-                game:GetService("ReplicatedStorage"):WaitForChild("RE"):WaitForChild("1Ca1r"):FireServer("PickingCar", carName)
-                wait(0.4)
+CarTab:AddToggle({"Spam Cars", "Spamar vários carros no servidor", function(state)
+    spamCarsActive = state
+    if state then
+        task.spawn(function()
+            local carList = {"SchoolBus","SmartCar","FarmTruck","Cadillac","Excavator","Jeep","NascarTruck","TowTruck","Snowplow","MilitaryTruck","Tank","Limo","FireTruck"}
+            while spamCarsActive do
+                for _, carName in ipairs(carList) do
+                    if not spamCarsActive then break end
+                    ReplicatedStorage:WaitForChild("RE"):WaitForChild("1Ca1r"):FireServer("PickingCar", carName)
+                    wait(0.4)
+                end
             end
-        end
-    end)
-    Fluent:Notify({ Title = "🚗 Spam Cars iniciado", Duration = 2 })
-end })
-CarTab:AddButton({ Title = "Parar Spam Cars", Callback = function()
-    spamCarsActive = false
-    if spamCoroutine then task.cancel(spamCoroutine) spamCoroutine = nil end
-    Fluent:Notify({ Title = "✅ Spam Cars parado", Duration = 2 })
-end })
+        end)
+    end
+end})
 
--- Speed e Turbo fixos (valores 50/50) ou pode adicionar botões para valores predefinidos
-CarTab:AddButton({ Title = "Aplicar Speed 50 + Turbo 50", Callback = function()
+-- Slider para velocidade do carro
+local carSpeed = 50
+CarTab:AddSlider({"Velocidade do Carro", 1, 200, 1, function(value)
+    carSpeed = value
+end})
+-- Slider para turbo
+local carTurbo = 50
+CarTab:AddSlider({"Turbo do Carro", 1, 200, 1, function(value)
+    carTurbo = value
+end})
+CarTab:AddButton({"Aplicar Speed e Turbo", function()
     local player = game.Players.LocalPlayer
     local car = workspace.Vehicles:FindFirstChild(player.Name .. "Car")
-    if car and car:FindFirstChild("Body") and car.Body:FindFirstChild("VehicleSeat") then
-        local seat = car.Body.VehicleSeat
-        pcall(function() seat.TopSpeed.Value = 50 end)
-        pcall(function() seat.Turbo.Value = 50 end)
-        Fluent:Notify({ Title = "✅ Velocidade aplicada", Duration = 2 })
-    else
-        Fluent:Notify({ Title = "❌ Carro não encontrado", Duration = 2 })
-    end
-end })
-
--- RGB Carro (start/stop)
-local isCarColorChanging = false
-local carColorCoroutine = nil
-local carColors = {Color3.new(1,0,0),Color3.new(0,1,0),Color3.new(0,0,1),Color3.new(1,1,0),Color3.new(1,0,1),Color3.new(0,1,1),Color3.new(0.5,0,0.5),Color3.new(1,0.5,0)}
-CarTab:AddButton({ Title = "Iniciar RGB Carro", Callback = function()
-    if carColorCoroutine then return end
-    isCarColorChanging = true
-    carColorCoroutine = task.spawn(function()
-        while isCarColorChanging do
-            for _, color in ipairs(carColors) do
-                if not isCarColorChanging then return end
-                pcall(function() ReplicatedStorage:WaitForChild("RE"):WaitForChild("1Player1sCa1r"):FireServer("PickingCarColor", color) end)
-                wait(1)
-            end
+    if car then
+        local body = car:FindFirstChild("Body") and car.Body:FindFirstChild("VehicleSeat")
+        if body then
+            pcall(function() body.TopSpeed.Value = carSpeed end)
+            pcall(function() body.Turbo.Value = carTurbo end)
+            redzlib:Notification({Title = "✅ Velocidade", Text = "Speed: "..carSpeed.." | Turbo: "..carTurbo, Duration = 3})
+        else
+            redzlib:Notification({Title = "❌ Erro", Text = "Sente-se no carro primeiro!", Duration = 2})
         end
-    end)
-    Fluent:Notify({ Title = "🎨 RGB Carro ativado", Duration = 2 })
-end })
-CarTab:AddButton({ Title = "Parar RGB Carro", Callback = function()
-    isCarColorChanging = false
-    if carColorCoroutine then task.cancel(carColorCoroutine) carColorCoroutine = nil end
-    Fluent:Notify({ Title = "✅ RGB Carro parado", Duration = 2 })
-end })
-
--- ======================== ABA: CASAS (seleção por botões) ========================
-local HouseTab = Window:AddTab({ Title = "Casas", Icon = "home" })
-HouseTab:AddParagraph({ Title = "Selecione uma casa", Content = "Clique no nome da casa para usá-la nos botões abaixo." })
-
-local selectedHouse = nil
-local houseButtons = {}
-local function refreshHouseList()
-    for _, btn in pairs(houseButtons) do
-        if btn and btn.Destroy then btn:Destroy() end
+    else
+        redzlib:Notification({Title = "❌ Erro", Text = "Coloque um carro primeiro!", Duration = 2})
     end
-    houseButtons = {}
+end})
+
+-- Toggle: RGB Carro
+local isCarColorChanging = false
+local carColors = {Color3.new(1,0,0),Color3.new(0,1,0),Color3.new(0,0,1),Color3.new(1,1,0),Color3.new(1,0,1),Color3.new(0,1,1),Color3.new(0.5,0,0.5),Color3.new(1,0.5,0)}
+CarTab:AddToggle({"RGB Carro", "Altera a cor do carro automaticamente", function(state)
+    isCarColorChanging = state
+    if state then
+        task.spawn(function()
+            while isCarColorChanging do
+                for _, color in ipairs(carColors) do
+                    if not isCarColorChanging then return end
+                    pcall(function() ReplicatedStorage:WaitForChild("RE"):WaitForChild("1Player1sCa1r"):FireServer("PickingCarColor", color) end)
+                    wait(1)
+                end
+            end
+        end)
+    end
+end})
+
+-- ======================== ABA: CASAS ========================
+local HouseTab = Window:MakeTab({"Casas", "home"})
+
+-- Dropdown para selecionar casa
+local selectedHouse = nil
+local houseOptions = {}
+local function updateHouseList()
+    local newList = {}
     local lots = workspace:FindFirstChild("001_Lots")
     if lots then
         for _, house in ipairs(lots:GetChildren()) do
             if house.Name ~= "For Sale" and house:IsA("Model") then
-                local btn = HouseTab:AddButton({ Title = "🏠 " .. house.Name, Callback = function()
-                    selectedHouse = house.Name
-                    Fluent:Notify({ Title = "✅ Casa selecionada", Content = selectedHouse, Duration = 2 })
-                end })
-                table.insert(houseButtons, btn)
+                table.insert(newList, house.Name)
             end
         end
     end
-    if #houseButtons == 0 then
-        local btn = HouseTab:AddButton({ Title = "Nenhuma casa disponível", Callback = function() end })
-        table.insert(houseButtons, btn)
-    end
+    if #newList == 0 then table.insert(newList, "Nenhuma casa") end
+    houseDropdown:Set(newList)
 end
-refreshHouseList()
-HouseTab:AddButton({ Title = "Atualizar Lista de Casas", Callback = refreshHouseList })
+local houseDropdown = HouseTab:AddDropdown({"Selecionar Casa", "Escolha uma casa", {"Carregando..."}, function(value)
+    selectedHouse = value
+end})
+updateHouseList()
+HouseTab:AddButton({"Atualizar Lista de Casas", updateHouseList})
 
-HouseTab:AddButton({ Title = "Teleportar para Casa Selecionada", Callback = function()
-    if not selectedHouse then Fluent:Notify({ Title = "❌ Selecione uma casa", Duration = 2 }) return end
+HouseTab:AddButton({"Teleportar para Casa", function()
+    if not selectedHouse then redzlib:Notification({Title="Erro", Text="Selecione uma casa", Duration=2}) return end
     local house = workspace["001_Lots"]:FindFirstChild(selectedHouse)
     if house and LocalPlayer.Character then
         LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(house.WorldPivot.Position)
     end
-end })
+end})
 
-HouseTab:AddButton({ Title = "Teleportar para Cofre da Casa", Callback = function()
-    if not selectedHouse then Fluent:Notify({ Title = "❌ Selecione uma casa", Duration = 2 }) return end
+HouseTab:AddButton({"Teleportar para Cofre", function()
+    if not selectedHouse then redzlib:Notification({Title="Erro", Text="Selecione uma casa", Duration=2}) return end
     local house = workspace["001_Lots"]:FindFirstChild(selectedHouse)
     if house and house:FindFirstChild("HousePickedByPlayer") and LocalPlayer.Character then
         local safe = house.HousePickedByPlayer.HouseModel:FindFirstChild("001_Safe")
         if safe then LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(safe.WorldPivot.Position) end
     end
-end })
+end})
 
--- Atravessar porta (toggle via start/stop)
+-- Toggle: Atravessar Porta
 local atravessarAtivo = false
-local atravessarCoroutine = nil
-HouseTab:AddButton({ Title = "Iniciar Atravessar Porta", Callback = function()
-    if atravessarCoroutine then return end
-    atravessarAtivo = true
-    atravessarCoroutine = task.spawn(function()
-        while atravessarAtivo do
-            if selectedHouse then
+HouseTab:AddToggle({"Atravessar Porta", "Desativa colisão da porta da casa", function(state)
+    atravessarAtivo = state
+    if state then
+        task.spawn(function()
+            while atravessarAtivo and selectedHouse do
                 local house = workspace["001_Lots"]:FindFirstChild(selectedHouse)
                 if house and house:FindFirstChild("HousePickedByPlayer") then
                     local doors = house.HousePickedByPlayer.HouseModel:FindFirstChild("001_HouseDoors")
@@ -980,39 +931,31 @@ HouseTab:AddButton({ Title = "Iniciar Atravessar Porta", Callback = function()
                         end
                     end
                 end
+                task.wait(0.5)
             end
-            task.wait(0.5)
-        end
-    end)
-    Fluent:Notify({ Title = "🚪 Atravessar porta ativado", Duration = 2 })
-end })
-HouseTab:AddButton({ Title = "Parar Atravessar Porta", Callback = function()
-    atravessarAtivo = false
-    if atravessarCoroutine then task.cancel(atravessarCoroutine) atravessarCoroutine = nil end
-    -- reativar colisão
-    if selectedHouse then
-        local house = workspace["001_Lots"]:FindFirstChild(selectedHouse)
-        if house and house:FindFirstChild("HousePickedByPlayer") then
-            local doors = house.HousePickedByPlayer.HouseModel:FindFirstChild("001_HouseDoors")
-            if doors and doors:FindFirstChild("HouseDoorFront") then
-                for _, base in ipairs(doors.HouseDoorFront:GetChildren()) do
-                    if base:IsA("BasePart") then base.CanCollide = true end
+            -- Ao desativar, recoloca colisão se possível
+            if not atravessarAtivo and selectedHouse then
+                local house = workspace["001_Lots"]:FindFirstChild(selectedHouse)
+                if house and house:FindFirstChild("HousePickedByPlayer") then
+                    local doors = house.HousePickedByPlayer.HouseModel:FindFirstChild("001_HouseDoors")
+                    if doors and doors:FindFirstChild("HouseDoorFront") then
+                        for _, base in ipairs(doors.HouseDoorFront:GetChildren()) do
+                            if base:IsA("BasePart") then base.CanCollide = true end
+                        end
+                    end
                 end
             end
-        end
+        end)
     end
-    Fluent:Notify({ Title = "✅ Atravessar porta parado", Duration = 2 })
-end })
+end})
 
--- Tocar campainha (start/stop)
+-- Toggle: Tocar Campainha
 local campainhaAtivo = false
-local campainhaCoroutine = nil
-HouseTab:AddButton({ Title = "Iniciar Tocar Campainha", Callback = function()
-    if campainhaCoroutine then return end
-    campainhaAtivo = true
-    campainhaCoroutine = task.spawn(function()
-        while campainhaAtivo do
-            if selectedHouse then
+HouseTab:AddToggle({"Tocar Campainha", "Toca a campainha da casa repetidamente", function(state)
+    campainhaAtivo = state
+    if state then
+        task.spawn(function()
+            while campainhaAtivo and selectedHouse do
                 local house = workspace["001_Lots"]:FindFirstChild(selectedHouse)
                 if house and house:FindFirstChild("HousePickedByPlayer") then
                     local doorbell = house.HousePickedByPlayer.HouseModel:FindFirstChild("001_DoorBell")
@@ -1020,27 +963,19 @@ HouseTab:AddButton({ Title = "Iniciar Tocar Campainha", Callback = function()
                         pcall(function() fireclickdetector(doorbell.TouchBell.ClickDetector) end)
                     end
                 end
+                task.wait(0.5)
             end
-            task.wait(0.5)
-        end
-    end)
-    Fluent:Notify({ Title = "🔔 Campainha ativada", Duration = 2 })
-end })
-HouseTab:AddButton({ Title = "Parar Tocar Campainha", Callback = function()
-    campainhaAtivo = false
-    if campainhaCoroutine then task.cancel(campainhaCoroutine) campainhaCoroutine = nil end
-    Fluent:Notify({ Title = "✅ Campainha parada", Duration = 2 })
-end })
+        end)
+    end
+end})
 
--- Bater na porta (start/stop)
+-- Toggle: Bater na Porta
 local baterAtivo = false
-local baterCoroutine = nil
-HouseTab:AddButton({ Title = "Iniciar Bater na Porta", Callback = function()
-    if baterCoroutine then return end
-    baterAtivo = true
-    baterCoroutine = task.spawn(function()
-        while baterAtivo do
-            if selectedHouse then
+HouseTab:AddToggle({"Bater na Porta", "Bate na porta repetidamente", function(state)
+    baterAtivo = state
+    if state then
+        task.spawn(function()
+            while baterAtivo and selectedHouse do
                 local house = workspace["001_Lots"]:FindFirstChild(selectedHouse)
                 if house and house:FindFirstChild("HousePickedByPlayer") then
                     local doors = house.HousePickedByPlayer.HouseModel:FindFirstChild("001_HouseDoors")
@@ -1048,43 +983,31 @@ HouseTab:AddButton({ Title = "Iniciar Bater na Porta", Callback = function()
                         pcall(function() fireclickdetector(doors.HouseDoorFront.Knock.TouchBell.ClickDetector) end)
                     end
                 end
+                task.wait(0.5)
             end
-            task.wait(0.5)
-        end
-    end)
-    Fluent:Notify({ Title = "🚪 Batendo na porta", Duration = 2 })
-end })
-HouseTab:AddButton({ Title = "Parar Bater na Porta", Callback = function()
-    baterAtivo = false
-    if baterCoroutine then task.cancel(baterCoroutine) baterCoroutine = nil end
-    Fluent:Notify({ Title = "✅ Parado", Duration = 2 })
-end })
+        end)
+    end
+end})
 
--- RGB Casa (start/stop)
+-- Toggle: RGB Casa
 local isHouseRGBActive = false
-local houseRGBCoroutine = nil
 local houseColorsList = {Color3.new(1,0,0),Color3.new(0,1,0),Color3.new(0,0,1),Color3.new(1,1,0),Color3.new(1,0,1),Color3.new(0,1,1)}
-HouseTab:AddButton({ Title = "Iniciar RGB Casa", Callback = function()
-    if houseRGBCoroutine then return end
-    isHouseRGBActive = true
-    houseRGBCoroutine = task.spawn(function()
-        while isHouseRGBActive do
-            for _, color in ipairs(houseColorsList) do
-                if not isHouseRGBActive then return end
-                pcall(function() ReplicatedStorage:FindFirstChild("RE"):FindFirstChild("1Player1sHous1e"):FireServer("ColorPickHouse", color) end)
-                task.wait(0.8)
+HouseTab:AddToggle({"RGB Casa", "Alterna cores da casa automaticamente", function(state)
+    isHouseRGBActive = state
+    if state then
+        task.spawn(function()
+            while isHouseRGBActive do
+                for _, color in ipairs(houseColorsList) do
+                    if not isHouseRGBActive then return end
+                    pcall(function() ReplicatedStorage:FindFirstChild("RE"):FindFirstChild("1Player1sHous1e"):FireServer("ColorPickHouse", color) end)
+                    task.wait(0.8)
+                end
             end
-        end
-    end)
-    Fluent:Notify({ Title = "🏠 RGB Casa ativado", Duration = 2 })
-end })
-HouseTab:AddButton({ Title = "Parar RGB Casa", Callback = function()
-    isHouseRGBActive = false
-    if houseRGBCoroutine then task.cancel(houseRGBCoroutine) houseRGBCoroutine = nil end
-    Fluent:Notify({ Title = "✅ RGB Casa parado", Duration = 2 })
-end })
+        end)
+    end
+end})
 
--- Teleportes rápidos (botões simples)
+-- Teleportes rápidos para casas conhecidas (botões)
 local casas = {
     ["Casa 1"] = Vector3.new(260.29, 4.37, 209.32),
     ["Casa 2"] = Vector3.new(234.49, 4.37, 228.00),
@@ -1099,61 +1022,49 @@ local casas = {
     ["Casa 14"] = Vector3.new(254, 38, 394),
     ["Casa 15"] = Vector3.new(148, 39, 387),
 }
-HouseTab:AddParagraph({ Title = "Teleporte Rápido", Content = "Clique para ir direto" })
+HouseTab:AddParagraph({"Teleporte Rápido", "Clique para ir direto"})
 for nomeCasa, pos in pairs(casas) do
-    HouseTab:AddButton({ Title = nomeCasa, Callback = function()
+    HouseTab:AddButton({nomeCasa, function()
         local root = game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
         if root then root.CFrame = CFrame.new(pos) end
-    end })
+    end})
 end
 
 -- ======================== ABA: NOMES ========================
-local NomesTab = Window:AddTab({ Title = "Nomes", Icon = "tag" })
+local NomesTab = Window:MakeTab({"Nomes", "tag"})
 
--- Nome RGB (start/stop)
+-- Toggle: Nome RGB
 local isNameActive = false
-local nameRGBCoroutine = nil
 local vibrantColors = {Color3.fromRGB(255,0,0),Color3.fromRGB(0,255,0),Color3.fromRGB(0,0,255),Color3.fromRGB(255,255,0),Color3.fromRGB(255,0,255),Color3.fromRGB(0,255,255),Color3.fromRGB(255,165,0),Color3.fromRGB(128,0,128),Color3.fromRGB(255,20,147)}
-NomesTab:AddButton({ Title = "Iniciar Nome RGB", Callback = function()
-    if nameRGBCoroutine then return end
-    isNameActive = true
-    nameRGBCoroutine = task.spawn(function()
-        while isNameActive do
-            local randomColor = vibrantColors[math.random(#vibrantColors)]
-            pcall(function() game:GetService("ReplicatedStorage").RE:FindFirstChild("1RPNam1eColo1r"):FireServer("PickingRPNameColor", randomColor) end)
-            wait(0.7)
-        end
-    end)
-    Fluent:Notify({ Title = "🎨 Nome RGB ativado", Duration = 2 })
-end })
-NomesTab:AddButton({ Title = "Parar Nome RGB", Callback = function()
-    isNameActive = false
-    if nameRGBCoroutine then task.cancel(nameRGBCoroutine) nameRGBCoroutine = nil end
-    Fluent:Notify({ Title = "✅ Nome RGB parado", Duration = 2 })
-end })
+NomesTab:AddToggle({"Nome RGB", "Altera a cor do nome RP automaticamente", function(state)
+    isNameActive = state
+    if state then
+        task.spawn(function()
+            while isNameActive do
+                local randomColor = vibrantColors[math.random(#vibrantColors)]
+                pcall(function() game:GetService("ReplicatedStorage").RE:FindFirstChild("1RPNam1eColo1r"):FireServer("PickingRPNameColor", randomColor) end)
+                wait(0.7)
+            end
+        end)
+    end
+end})
 
--- Bio RGB (start/stop)
+-- Toggle: BIO RGB
 local isBioActive = false
-local bioRGBCoroutine = nil
-NomesTab:AddButton({ Title = "Iniciar BIO RGB", Callback = function()
-    if bioRGBCoroutine then return end
-    isBioActive = true
-    bioRGBCoroutine = task.spawn(function()
-        while isBioActive do
-            local randomColor = vibrantColors[math.random(#vibrantColors)]
-            pcall(function() game:GetService("ReplicatedStorage").RE:FindFirstChild("1RPNam1eColo1r"):FireServer("PickingRPBioColor", randomColor) end)
-            wait(0.7)
-        end
-    end)
-    Fluent:Notify({ Title = "📝 BIO RGB ativada", Duration = 2 })
-end })
-NomesTab:AddButton({ Title = "Parar BIO RGB", Callback = function()
-    isBioActive = false
-    if bioRGBCoroutine then task.cancel(bioRGBCoroutine) bioRGBCoroutine = nil end
-    Fluent:Notify({ Title = "✅ BIO RGB parada", Duration = 2 })
-end })
+NomesTab:AddToggle({"BIO RGB", "Altera a cor da BIO automaticamente", function(state)
+    isBioActive = state
+    if state then
+        task.spawn(function()
+            while isBioActive do
+                local randomColor = vibrantColors[math.random(#vibrantColors)]
+                pcall(function() game:GetService("ReplicatedStorage").RE:FindFirstChild("1RPNam1eColo1r"):FireServer("PickingRPBioColor", randomColor) end)
+                wait(0.7)
+            end
+        end)
+    end
+end})
 
--- Nomes fixos (botões)
+-- Botões para nomes predefinidos
 local namesList = {
     {"Anonymus", " Anonymus "},{"PRO"," PRO "},{"ERR0R_666"," ERR0R_666 "},{"DARKNE1SSS"," DARKNE1SSS "},
     {"GHOST"," GHOST "},{"JOKER"," JOKER "},{"ADMIN"," ADMIN "},{"TUBERS93"," TUBERS 93 "},
@@ -1161,13 +1072,13 @@ local namesList = {
     {"BAD BOY"," BAD BOY "},{"ADM_TROLLKKS"," ADM_TROLLKKS "},{"67 HUB"," 67 HUB "}
 }
 for _, namePair in ipairs(namesList) do
-    NomesTab:AddButton({ Title = "Nome: " .. namePair[1], Callback = function()
+    NomesTab:AddButton({namePair[1], function()
         pcall(function() game:GetService("ReplicatedStorage").RE["1RPNam1eTex1t"]:FireServer("RolePlayName", namePair[2]) end)
-        Fluent:Notify({ Title = "✅ Nome aplicado", Content = namePair[1], Duration = 2 })
-    end })
+        redzlib:Notification({Title = "✅ Nome", Text = namePair[1] .. " aplicado!", Duration = 2})
+    end})
 end
 
--- FINALIZAÇÃO
-Window:SelectTab(1)
-Fluent:Notify({ Title = "✅ 67 Hub (Only Tabs & Buttons)", Content = "Carregado! Use apenas botões.", Duration = 4 })
-print("✅ 67 Hub carregado - versão somente abas e botões")
+-- ======================== FINALIZAÇÃO ========================
+Window:SelectTab(InfoTab) -- seleciona a primeira aba
+redzlib:Notification({Title = "✅ 67 HUB", Text = "Carregado com redzlib! | by yuki/ADM_TROLLKKS", Duration = 4})
+print("✅ 67 HUB - redzlib Edition carregado!")
